@@ -28,14 +28,14 @@ public class WifiAccount {
         pwd = preferences.getString(KEY_PASSWORD, "testpwd");
         Log.i("AutoLogin", user + "");
         Log.i("AutoLogin", pwd + "");
-         isLogin = user != null && pwd != null;
+        isLogin = user != null && pwd != null;
     }
 
-    public void setLoginInfo(String username, String password) {
+    public void setLoginInfo(String user, String pwd) {
         Editor prefEditor = preferences.edit();
         isLogin = true;
         this.user = user;
-        this.pwd = password;
+        this.pwd = pwd;
         prefEditor.putString(KEY_USERNAME, user);
         prefEditor.putString(KEY_PASSWORD, pwd);
         prefEditor.apply();

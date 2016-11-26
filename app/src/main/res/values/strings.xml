@@ -73,4 +73,7 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="list_preference_entry_default_values">itw</string>
+
+    <string name="wifi_login_success">登入成功</string>>
+    <string name="wifi_login_check_pw">登入失敗</string>>
 </resources>
