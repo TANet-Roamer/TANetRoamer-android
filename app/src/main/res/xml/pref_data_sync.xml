@@ -2,26 +2,23 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <ListPreference
-        android:defaultValue="1"
         android:title="所屬學校"
-        android:entries="@array/list_units"
-        android:entryValues="@array/list_units"
-        android:key="list_preference_2" />
+        android:key="school_studing" />
     <ListPreference
         android:defaultValue="itw"
         android:title="帳號類型"
         android:entries="@array/list_preference_entries"
-        android:entryValues="@array/list_preference_entries"
-        android:key="list_preference_1" />
+        android:entryValues="@array/list_preference_entry_values"
+        android:key="id_type" />
     <EditTextPreference
-        android:defaultValue="Default value"
+        android:defaultValue=""
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:title="帳號"
         android:key="wifi_username"
         android:summary="wifi_username" />
     <EditTextPreference
-        android:defaultValue="Default value"
+        android:defaultValue=""
         android:selectAllOnFocus="true"
         android:title="密碼"
         android:key="wifi_password"
@@ -30,6 +27,6 @@
     <SwitchPreference
         android:defaultValue="false"
         android:title="是否自動登入"
-        android:key="switch_preference_1" />
+        android:key="autologin" />
 
 </PreferenceScreen>

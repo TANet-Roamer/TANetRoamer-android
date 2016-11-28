@@ -1,6 +1,5 @@
 package org.aliangliang.tanetroamer;
 
-
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
@@ -19,7 +18,26 @@ import android.preference.RingtonePreference;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
+import com.google.android.gms.common.api.GoogleApiClient;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
+
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
  * handset devices, settings are presented as a single list. On tablets,
@@ -32,16 +50,27 @@ import java.util.List;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         final Intent intent = getIntent();
         intent.putExtra(EXTRA_SHOW_FRAGMENT, DataSyncPreferenceFragment.class.getName());
         startActivity(intent);
         super.onCreate(savedInstanceState);
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean onIsMultiPane() {
         return isXLargeTablet(this);
@@ -53,10 +82,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      */
     private static boolean isXLargeTablet(Context context) {
         return (context.getResources().getConfiguration().screenLayout
-        & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+                & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public void onBuildHeaders(List<Header> target) {
@@ -132,7 +163,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 .getDefaultSharedPreferences(preference.getContext())
                 .getString(preference.getKey(), "");
 
-        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,(useMask)?value.replaceAll(".", "*"):value );
+        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, (useMask) ? value.replaceAll(".", "*") : value);
     }
 
     /**
@@ -144,6 +175,42 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 || DataSyncPreferenceFragment.class.getName().equals(fragmentName);
     }
 
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    public Action getIndexApiAction() {
+        Thing object = new Thing.Builder()
+                .setName("Settings Page") // TODO: Define a title for the content shown.
+                // TODO: Make sure this auto-generated URL is correct.
+                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+                .build();
+        return new Action.Builder(Action.TYPE_VIEW)
+                .setObject(object)
+                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+                .build();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        AppIndex.AppIndexApi.start(client, getIndexApiAction());
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        AppIndex.AppIndexApi.end(client, getIndexApiAction());
+        client.disconnect();
+    }
+
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class DataSyncPreferenceFragment extends PreferenceFragment {
         @Override
@@ -152,10 +219,61 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             addPreferencesFromResource(R.xml.pref_data_sync);
             setHasOptionsMenu(true);
 
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
+            InputStream is = findPreference("school_studing").getContext().getResources().openRawResource(R.raw.units);
+            Writer writer = new StringWriter();
+            char[] buffer = new char[1024];
+            try {
+                Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+                int n;
+                while ((n = reader.read(buffer)) != -1) {
+                    writer.write(buffer, 0, n);
+                }
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            String jsonString = writer.toString();
+            JSONArray json;
+            try {
+                json = new JSONArray(jsonString);
+            } catch (JSONException e) {
+                e.printStackTrace();
+                json = new JSONArray();
+            }
+
+            ArrayList<CharSequence> entries = new ArrayList<CharSequence>();
+            ArrayList<CharSequence> entryValues = new ArrayList<CharSequence>();
+
+            int i = 0;
+            try {
+                JSONObject obj;
+                while ((obj = json.getJSONObject(i)) != null) {
+                    try {
+                        entries.add(i, (CharSequence) obj.getString("name")); //for example
+                        entryValues.add(i, (CharSequence) obj.getString("id")); //for example
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    i++;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            ListPreference lp = (ListPreference) findPreference("school_studing");
+            lp.setEntries(entries.toArray(new CharSequence[entries.size()]));
+            lp.setEntryValues(entryValues.toArray(new CharSequence[entryValues.size()]));
+            lp.setDefaultValue("0015");
+
+            bindPreferenceSummaryToValue(findPreference("school_studing"), false);
+            bindPreferenceSummaryToValue(findPreference("id_type"), false);
             bindPreferenceSummaryToValue(findPreference("wifi_username"), false);
             bindPreferenceSummaryToValue(findPreference("wifi_password"), true);
         }

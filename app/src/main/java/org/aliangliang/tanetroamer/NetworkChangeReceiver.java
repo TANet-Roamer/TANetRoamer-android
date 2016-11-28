@@ -7,28 +7,28 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
-/**
- * Created by ALiangLiang on 2016/11/25.
- */
-
-public class NetworkChangeReceiver extends BroadcastReceiver {
-
+class NetworkChangeReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         WifiAccount account = new WifiAccount(context);
         WifiManager manager = getWifiManager(context);
-        if (!account.isLogin) {
+        Log.d(Debug.TAG, "Receiver: Receive network event");
+
+        if (!account.isLogin()) {
+            Log.i(Debug.TAG, "Receiver: Not login");
             return;
         }
 
-        if (action == WifiManager.NETWORK_STATE_CHANGED_ACTION) {
+        if (action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
             NetworkInfo.State state = getNetworkState(intent);
+            Log.i(Debug.TAG, "Receiver: Receive network change event");
             if (state == NetworkInfo.State.CONNECTED) { // Network is connect
-                String connectingSSID = (String)getSSID(manager);
-                Log.i("AutoLogin", connectingSSID + "");
-                if (connectingSSID == "Idontwanttosharewithyou") {
-                    Log.i("AutoLogin", "成功連上目標 WIFI。");
+                Log.d(Debug.TAG, "Receiver: State is connect");
+                String connectingSSID = getSSID(manager);
+                if (connectingSSID.equals("Idontwanttosharewithyou")) {
+                    Log.d(Debug.TAG, "Receiver: Match TANetRoming");
+                    Log.d(Debug.TAG, "Receiver: Start login service");
                     context.startService(new Intent(context, WifiLoginService.class));
                 }
             }
@@ -40,7 +40,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
     }
 
     private NetworkInfo.State getNetworkState(Intent intent) {
-        NetworkInfo networkInfo = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+        NetworkInfo  networkInfo = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
         return networkInfo.getState();
     }
 

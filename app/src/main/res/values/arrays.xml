@@ -1,10 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="list_units">
-        <item>國立彰化師範大學</item>
-        <item>國立中興大學</item>
-        <item>國立中央大學</item>
-        <item>國立中正大學</item>
-        <item>逢甲大學</item>
-    </string-array>
 </resources>
