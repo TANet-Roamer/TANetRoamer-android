@@ -3,16 +3,29 @@ package org.aliangliang.tanetroamer;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 
-class NetworkChangeReceiver extends BroadcastReceiver {
+import org.json.JSONException;
+
+public class NetworkChangeReceiver extends BroadcastReceiver {
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        WifiAccount account = new WifiAccount(context);
-        WifiManager manager = getWifiManager(context);
+        Log.d(Debug.TAG, "Receiver: Action:" + action);
+
+        WifiAccount account = null;
+        try {
+            account = new WifiAccount(context);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         Log.d(Debug.TAG, "Receiver: Receive network event");
 
         if (!account.isLogin()) {
@@ -20,17 +33,22 @@ class NetworkChangeReceiver extends BroadcastReceiver {
             return;
         }
 
-        if (action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
+        if(action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
             NetworkInfo.State state = getNetworkState(intent);
-            Log.i(Debug.TAG, "Receiver: Receive network change event");
-            if (state == NetworkInfo.State.CONNECTED) { // Network is connect
+            Log.i(Debug.TAG, "Receiver: Receive network change event: " + state);
+            final ConnectivityManager conMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            final NetworkInfo activeNetwork = conMgr.getActiveNetworkInfo();
+            if (activeNetwork != null && activeNetwork.isConnected()) {
                 Log.d(Debug.TAG, "Receiver: State is connect");
+                WifiManager manager = getWifiManager(context);
                 String connectingSSID = getSSID(manager);
-                if (connectingSSID.equals("Idontwanttosharewithyou")) {
+                if (connectingSSID.equals("Idontwanttosharewithyou") || connectingSSID.equals("TANetRoming")) {
                     Log.d(Debug.TAG, "Receiver: Match TANetRoming");
-                    Log.d(Debug.TAG, "Receiver: Start login service");
+                    Log.i(Debug.TAG, "Receiver: Start login service");
                     context.startService(new Intent(context, WifiLoginService.class));
                 }
+            } else {
+                Log.d(Debug.TAG, "Receiver: Not connect yet");
             }
         }
     }

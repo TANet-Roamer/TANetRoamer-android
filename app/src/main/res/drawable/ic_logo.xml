@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="1024dp"
+    android:height="1280dp"
+    android:viewportWidth="1024"
+    android:viewportHeight="1280">
+    <path
+        android:fillColor="#555"
+        android:name="橢圓 1 拷貝 3"
+        android:pathData="m512.5 405.6c59.1 0 106.9 47.9 106.9 106.9c0 59.1 -47.9 106.9 -106.9 106.9c-59.1 0 -106.9 -47.9 -106.9 -106.9c0 -59.1 47.9 -106.9 106.9 -106.9z" />
+    <path
+        android:name="橢圓 1 拷貝 3"
+        android:pathData="m512.5 455.6c31.4 0 56.9 25.5 56.9 56.9c0 31.4 -25.5 56.9 -56.9 56.9c-31.4 0 -56.9 -25.5 -56.9 -56.9c0 -31.4 25.5 -56.9 56.9 -56.9zm0 -50c-59.1 0 -106.9 47.9 -106.9 106.9c0 59.1 47.9 106.9 106.9 106.9c59.1 0 106.9 -47.9 106.9 -106.9c0 -59.1 -47.9 -106.9 -106.9 -106.9z"
+        android:fillColor="#555" />
+</vector>

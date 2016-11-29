@@ -10,23 +10,57 @@
         android:entries="@array/list_preference_entries"
         android:entryValues="@array/list_preference_entry_values"
         android:key="id_type" />
-    <EditTextPreference
-        android:defaultValue=""
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="帳號"
-        android:key="wifi_username"
-        android:summary="wifi_username" />
-    <EditTextPreference
-        android:defaultValue=""
-        android:selectAllOnFocus="true"
-        android:title="密碼"
-        android:key="wifi_password"
-        android:summary="wifi_password"
-        android:singleLine="true" />
+    <PreferenceCategory android:title="校園帳戶">
+        <EditTextPreference
+            android:defaultValue=""
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="帳號"
+            android:key="wifi_normal_username"
+            android:summary="帳號" />
+        <EditTextPreference
+            android:defaultValue=""
+            android:selectAllOnFocus="true"
+            android:title="密碼"
+            android:key="wifi_normal_password"
+            android:summary="密碼"
+            android:singleLine="true" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="校園信箱">
+        <EditTextPreference
+            android:defaultValue=""
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="信箱"
+            android:key="wifi_email_username"
+            android:summary="信箱" />
+        <EditTextPreference
+            android:defaultValue=""
+            android:selectAllOnFocus="true"
+            android:title="密碼"
+            android:key="wifi_email_password"
+            android:summary="密碼"
+            android:singleLine="true" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="iTaiwan 帳戶">
+        <EditTextPreference
+            android:defaultValue=""
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="帳號"
+            android:key="wifi_itw_username"
+            android:summary="帳號" />
+        <EditTextPreference
+            android:defaultValue=""
+            android:selectAllOnFocus="true"
+            android:title="密碼"
+            android:key="wifi_itw_password"
+            android:summary="密碼"
+            android:singleLine="true" />
+    </PreferenceCategory>
     <SwitchPreference
-        android:defaultValue="false"
+        android:defaultValue="true"
         android:title="是否自動登入"
-        android:key="autologin" />
+        android:key="is_auto_login" />
 
 </PreferenceScreen>

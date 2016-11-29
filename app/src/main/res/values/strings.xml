@@ -1,51 +1,8 @@
 <resources>
-    <string name="app_name">TANetRoamer-android</string>
-
-    <!-- Strings related to Settings -->
-
-    <!-- Example General settings -->
-    <string name="pref_header_general">General</string>
-
-    <string name="pref_title_social_recommendations">Enable social recommendations</string>
-    <string name="pref_description_social_recommendations">Recommendations for people to contact
-        based on your message history
-    </string>
-
-    <string name="pref_title_display_name">Display name</string>
-    <string name="pref_default_display_name">John Smith</string>
-
-    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
-    <string-array name="pref_example_list_titles">
-        <item>Always</item>
-        <item>When possible</item>
-        <item>Never</item>
-    </string-array>
-    <string-array name="pref_example_list_values">
-        <item>1</item>
-        <item>0</item>
-        <item>-1</item>
-    </string-array>
+    <string name="app_name">TANet Roamer</string>
 
     <!-- Example settings for Data & Sync -->
     <string name="pref_header_data_sync">設定</string>
-
-    <string name="pref_title_sync_frequency">Sync frequency</string>
-    <string-array name="pref_sync_frequency_titles">
-        <item>15 minutes</item>
-        <item>30 minutes</item>
-        <item>1 hour</item>
-        <item>3 hours</item>
-        <item>6 hours</item>
-        <item>Never</item>
-    </string-array>
-    <string-array name="pref_sync_frequency_values">
-        <item>15</item>
-        <item>30</item>
-        <item>60</item>
-        <item>180</item>
-        <item>360</item>
-        <item>-1</item>
-    </string-array>
 
     <string-array name="list_preference_entries">
         <item>校園帳號</item>
@@ -75,5 +32,8 @@
     <string name="list_preference_entry_default_values">itw</string>
 
     <string name="wifi_login_success">登入成功</string>>
-    <string name="wifi_login_check_pw">登入失敗</string>>
+    <string name="wifi_login_wrong_pwd">登入失敗，帳號密碼錯誤</string>>
+    <string name="wifi_login_unknown_reason">登入失敗，未知錯誤</string>>
+    <string name="wifi_login_duplicate_user">登入失敗，同一帳號重複登入</string>>
+    <string name="wifi_login_already_online">已經連上 TANet Roaming</string>>
 </resources>

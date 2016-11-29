@@ -15,8 +15,13 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.ListView;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -33,7 +38,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +71,34 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
+
+
+    private void setupActionBar() {
+        Toolbar toolbar;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            ViewGroup root = (ViewGroup) findViewById(android.R.id.list).getParent().getParent().getParent();
+            toolbar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.layout, root, false);
+            root.addView(toolbar, 0);
+        } else {
+            ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
+            ListView content = (ListView) root.getChildAt(0);
+            root.removeAllViews();
+            toolbar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.layout, root, false);
+            int height;
+            TypedValue tv = new TypedValue();
+            if (getTheme().resolveAttribute(R.attr.actionBarSize, tv, true)) {
+                height = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+            } else {
+                height = toolbar.getHeight();
+            }
+            content.setPadding(0, height, 0, 0);
+            root.addView(content);
+            root.addView(toolbar);
+        }
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
 
     /**
      * {@inheritDoc}
@@ -228,8 +260,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 while ((n = reader.read(buffer)) != -1) {
                     writer.write(buffer, 0, n);
                 }
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
@@ -252,18 +282,16 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             ArrayList<CharSequence> entries = new ArrayList<CharSequence>();
             ArrayList<CharSequence> entryValues = new ArrayList<CharSequence>();
 
-            int i = 0;
             try {
-                JSONObject obj;
-                while ((obj = json.getJSONObject(i)) != null) {
-                    try {
-                        entries.add(i, (CharSequence) obj.getString("name")); //for example
-                        entryValues.add(i, (CharSequence) obj.getString("id")); //for example
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                for(int i = 0; i < json.length(); i++) {
+                    JSONObject obj = json.getJSONObject(i);
+                    if(obj.has("data")) {
+                        entries.add((CharSequence) obj.getString("name"));
+                        entryValues.add((CharSequence) obj.getString("id"));
                     }
-                    i++;
                 }
+                entries.add("其他");
+                entryValues.add("9999");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -274,8 +302,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
             bindPreferenceSummaryToValue(findPreference("school_studing"), false);
             bindPreferenceSummaryToValue(findPreference("id_type"), false);
-            bindPreferenceSummaryToValue(findPreference("wifi_username"), false);
-            bindPreferenceSummaryToValue(findPreference("wifi_password"), true);
+            bindPreferenceSummaryToValue(findPreference("wifi_normal_username"), false);
+            bindPreferenceSummaryToValue(findPreference("wifi_normal_password"), true);
+            bindPreferenceSummaryToValue(findPreference("wifi_email_username"), false);
+            bindPreferenceSummaryToValue(findPreference("wifi_email_password"), true);
+            bindPreferenceSummaryToValue(findPreference("wifi_itw_username"), false);
+            bindPreferenceSummaryToValue(findPreference("wifi_itw_password"), true);
         }
 
         public boolean onOptionsItemSelected(MenuItem item) {
