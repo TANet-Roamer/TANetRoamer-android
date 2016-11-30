@@ -7,13 +7,11 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import org.json.JSONException;
 
 public class NetworkChangeReceiver extends BroadcastReceiver {
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
