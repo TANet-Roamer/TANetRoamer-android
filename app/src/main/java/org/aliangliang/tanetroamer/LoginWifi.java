@@ -108,17 +108,19 @@ class LoginWifi {
                 Log.d(Debug.TAG, "LoginTask: Response header: " + key + " " + value);
             }
             Log.i(Debug.TAG, "LoginTask: Check login");
-            String url = loginPage.header("Location");
-            Log.i(Debug.TAG, "LoginTask: Response redirect url: " + url);
-            if(url.contains("?errmsg=")) {
-                String reason = URLDecoder.decode(url.replaceFirst(".*?errmsg=", ""), "UTF-8");
-                Log.i(Debug.TAG, "LoginTask: Failed: " +  reason);
-                if(reason.equals("Authentication failed")) {
-                  return LOGIN_FAIL_AUTH_FAIL;
-                } else if(reason.equals("No auth server provisioned")) {
-                  return LOGIN_FAIL_DUPLICATE_USER;
+            if(loginPage.hasHeader("Location")) {
+                String url = loginPage.header("Location");
+                Log.i(Debug.TAG, "LoginTask: Response redirect url: " + url);
+                if(url.contains("?errmsg=")) {
+                    String reason = URLDecoder.decode(url.replaceFirst(".*?errmsg=", ""), "UTF-8");
+                    Log.i(Debug.TAG, "LoginTask: Failed: " +  reason);
+                    if(reason.equals("Authentication failed")) {
+                        return LOGIN_FAIL_AUTH_FAIL;
+                    } else if(reason.equals("No auth server provisioned")) {
+                        return LOGIN_FAIL_DUPLICATE_USER;
+                    }
+                    return LOGIN_FAIL_UNKNOWN_REASON;
                 }
-                return LOGIN_FAIL_UNKNOWN_REASON;
             }
             return LOGIN_SUCCESS;
         }
@@ -159,10 +161,11 @@ class LoginWifi {
                     return R.string.wifi_login_success;
                 case LOGIN_FAIL_AUTH_FAIL:
                     return R.string.wifi_login_wrong_pwd;
-                case LOGIN_FAIL_UNKNOWN_REASON:
+                case LOGIN_FAIL_DUPLICATE_USER:
                     return R.string.wifi_login_duplicate_user;
                 case ALREADY_ONLINE:
                     return R.string.wifi_login_already_online;
+                case LOGIN_FAIL_UNKNOWN_REASON:
                 default:
                     return R.string.wifi_login_unknown_reason;
             }
@@ -174,7 +177,7 @@ class LoginWifi {
             PendingIntent contentIntent = PendingIntent.getActivity(context, 0, new Intent(), 0);
             Resources resources = context.getResources();
             int msgId = getNotifyText(loginResult);
-            long[] vibrate_effect = {1000, 500, 1000, 400, 1000, 300, 1000, 200, 1000, 100};
+            long[] vibrate_effect = (loginResult.equals(LOGIN_SUCCESS))? new long[]{1000, 100} : new long[]{1000, 300, 300, 300};
             Notification n = new Notification
                     .Builder(context)
                     .setContentTitle(resources.getString(R.string.app_name))
