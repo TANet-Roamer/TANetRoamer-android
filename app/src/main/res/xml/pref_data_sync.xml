@@ -6,7 +6,7 @@
         android:key="school_studing" />
     <ListPreference
         android:defaultValue="itw"
-        android:title="帳號類型"
+        android:title="使用帳號類型"
         android:entries="@array/list_preference_entries"
         android:entryValues="@array/list_preference_entry_values"
         android:key="id_type" />
