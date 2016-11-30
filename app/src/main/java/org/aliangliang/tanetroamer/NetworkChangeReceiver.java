@@ -42,7 +42,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
                 Log.d(Debug.TAG, "Receiver: State is connect");
                 WifiManager manager = getWifiManager(context);
                 String connectingSSID = getSSID(manager);
-                if (connectingSSID.equals("Idontwanttosharewithyou") || connectingSSID.equals("TANetRoming")) {
+                if (connectingSSID.equals("Idontwanttosharewithyou") || connectingSSID.equals("TANetRoaming")) {
                     Log.d(Debug.TAG, "Receiver: Match TANetRoming");
                     Log.i(Debug.TAG, "Receiver: Start login service");
                     context.startService(new Intent(context, WifiLoginService.class));
