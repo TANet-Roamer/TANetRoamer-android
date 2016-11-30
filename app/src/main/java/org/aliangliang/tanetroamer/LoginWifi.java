@@ -64,7 +64,7 @@ class LoginWifi {
                 Response response = get204Response();
                 if (response.statusCode() == 204) { // Don't need to login
                     Log.i(Debug.TAG, "LoginTask: Online now");
-                    return "Online";
+                    return ALREADY_ONLINE;
                 }
             } catch (IOException e) {
                 Log.w(Debug.TAG, "LoginTask: Can not connect generate204, still login process");
@@ -74,10 +74,10 @@ class LoginWifi {
                 return doLogin();
             } catch (IOException e) {
                 Log.w(Debug.TAG, "LoginTask: Something bad happened...: " + e);
-                return "Unknown reason";
+                return LOGIN_FAIL_UNKNOWN_REASON;
             } catch (JSONException e) {
                 Log.w(Debug.TAG, "LoginTask:Is JSONObject has something happened?", e);
-                return "Unknown reason";
+                return LOGIN_FAIL_UNKNOWN_REASON;
             }
         }
 
@@ -113,9 +113,14 @@ class LoginWifi {
             if(url.contains("?errmsg=")) {
                 String reason = URLDecoder.decode(url.replaceFirst(".*?errmsg=", ""), "UTF-8");
                 Log.i(Debug.TAG, "LoginTask: Failed: " +  reason);
-                return reason;
+                if(reason.equals("Authentication failed")) {
+                  return LOGIN_FAIL_AUTH_FAIL;
+                } else if(reason.equals("No auth server provisioned")) {
+                  return LOGIN_FAIL_DUPLICATE_USER;
+                }
+                return LOGIN_FAIL_UNKNOWN_REASON;
             }
-            return "";
+            return LOGIN_SUCCESS;
         }
 
         /**
@@ -150,13 +155,13 @@ class LoginWifi {
          */
         private int getNotifyText(String result) {
             switch (result) {
-                case "":
+                case LOGIN_SUCCESS:
                     return R.string.wifi_login_success;
-                case "Authentication failed":
+                case LOGIN_FAIL_AUTH_FAIL:
                     return R.string.wifi_login_wrong_pwd;
-                case "No auth server provisioned":
+                case LOGIN_FAIL_UNKNOWN_REASON:
                     return R.string.wifi_login_duplicate_user;
-                case "Online":
+                case ALREADY_ONLINE:
                     return R.string.wifi_login_already_online;
                 default:
                     return R.string.wifi_login_unknown_reason;
@@ -185,6 +190,11 @@ class LoginWifi {
         }
     }
 
+    public static final String LOGIN_SUCCESS = "Success";
+    public static final String ALREADY_ONLINE = "Online";
+    public static final String LOGIN_FAIL_AUTH_FAIL = "Auth fail";
+    public static final String LOGIN_FAIL_DUPLICATE_USER = "Duplicate user";
+    public static final String LOGIN_FAIL_UNKNOWN_REASON = "Unknown reason";
     private Context context;
     private String username, password;
     private JSONObject apiData;
