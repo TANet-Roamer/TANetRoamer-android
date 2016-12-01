@@ -15,13 +15,10 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
-import android.support.v7.widget.Toolbar;
+import android.preference.SwitchPreference;
 import android.text.TextUtils;
-import android.util.TypedValue;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.MenuItem;
-import android.view.ViewGroup;
-import android.widget.ListView;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -71,35 +68,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
-
-
-    private void setupActionBar() {
-        Toolbar toolbar;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            ViewGroup root = (ViewGroup) findViewById(android.R.id.list).getParent().getParent().getParent();
-            toolbar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.layout, root, false);
-            root.addView(toolbar, 0);
-        } else {
-            ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
-            ListView content = (ListView) root.getChildAt(0);
-            root.removeAllViews();
-            toolbar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.layout, root, false);
-            int height;
-            TypedValue tv = new TypedValue();
-            if (getTheme().resolveAttribute(R.attr.actionBarSize, tv, true)) {
-                height = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
-            } else {
-                height = toolbar.getHeight();
-            }
-            content.setPadding(0, height, 0, 0);
-            root.addView(content);
-            root.addView(toolbar);
-        }
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -135,6 +103,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         public boolean onPreferenceChange(Preference preference, Object value) {
             String stringValue = value.toString();
 
+            Log.d(Debug.TAG, "SettingActivity: preference changed: " + preference.getKey());
             if (preference instanceof ListPreference) {
                 // For list preferences, look up the correct display value in
                 // the preference's 'entries' list.
@@ -169,6 +138,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     }
                 }
 
+            } else if (preference instanceof SwitchPreference) {
+                if(preference.getKey().equals("is_auto_login") && value.equals(true)) {
+                    Log.d(Debug.TAG, "SettingActivity: is_auto_login changed ");
+                    Context context = preference.getContext();
+                    context.startService(new Intent(context, WifiLoginService.class));
+                }
             } else {
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
@@ -191,11 +166,19 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         // Set the listener to watch for value changes.
         preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
 
-        String value = PreferenceManager
-                .getDefaultSharedPreferences(preference.getContext())
-                .getString(preference.getKey(), "");
+        Object value;
+        if(preference instanceof SwitchPreference) {
+            value = PreferenceManager
+                    .getDefaultSharedPreferences(preference.getContext())
+                    .getBoolean(preference.getKey(), true);
+        } else {
+            String str = PreferenceManager
+                    .getDefaultSharedPreferences(preference.getContext())
+                    .getString(preference.getKey(), "");
+            value = (useMask) ? str.replaceAll(".", "*") : str;
+        }
 
-        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, (useMask) ? value.replaceAll(".", "*") : value);
+        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, value);
     }
 
     /**
@@ -308,6 +291,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             bindPreferenceSummaryToValue(findPreference("wifi_email_password"), true);
             bindPreferenceSummaryToValue(findPreference("wifi_itw_username"), false);
             bindPreferenceSummaryToValue(findPreference("wifi_itw_password"), true);
+            bindPreferenceSummaryToValue(findPreference("is_auto_login"), false);
         }
 
         public boolean onOptionsItemSelected(MenuItem item) {

@@ -1,13 +1,6 @@
 package org.aliangliang.tanetroamer;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -46,17 +39,24 @@ class LoginWifi {
     /**
      * @return Successful login or not
      */
-    public boolean login() {
+    public boolean login(Callback callback) throws Exception {
         if (username == null || password == null) {
             Log.wtf(Debug.TAG, "Login: Username or password is null?!");
             return false;
         }
         Log.i(Debug.TAG, "Login: Start LoginTask");
-        new LoginTask().execute(context);
+        new LoginTask(callback).execute(context);
         return true;
     }
 
     private class LoginTask extends AsyncTask<Context, Void, String> {
+
+        private Callback callback;
+
+        LoginTask(Callback callback) throws Exception {
+            this.callback = callback;
+        }
+
         @Override
         protected String doInBackground(Context... contexts) {
             Log.i(Debug.TAG, "LoginTask: Start");
@@ -64,7 +64,7 @@ class LoginWifi {
                 Response response = get204Response();
                 if (response.statusCode() == 204) { // Don't need to login
                     Log.i(Debug.TAG, "LoginTask: Online now");
-                    return ALREADY_ONLINE;
+                    return GlobalValue.ALREADY_ONLINE;
                 }
             } catch (IOException e) {
                 Log.w(Debug.TAG, "LoginTask: Can not connect generate204, still login process");
@@ -74,10 +74,10 @@ class LoginWifi {
                 return doLogin();
             } catch (IOException e) {
                 Log.w(Debug.TAG, "LoginTask: Something bad happened...: " + e);
-                return LOGIN_FAIL_UNKNOWN_REASON;
+                return GlobalValue.LOGIN_FAIL_UNKNOWN_REASON;
             } catch (JSONException e) {
                 Log.w(Debug.TAG, "LoginTask:Is JSONObject has something happened?", e);
-                return LOGIN_FAIL_UNKNOWN_REASON;
+                return GlobalValue.LOGIN_FAIL_UNKNOWN_REASON;
             }
         }
 
@@ -115,14 +115,14 @@ class LoginWifi {
                     String reason = URLDecoder.decode(url.replaceFirst(".*?errmsg=", ""), "UTF-8");
                     Log.i(Debug.TAG, "LoginTask: Failed: " +  reason);
                     if(reason.equals("Authentication failed")) {
-                        return LOGIN_FAIL_AUTH_FAIL;
+                        return GlobalValue.LOGIN_FAIL_AUTH_FAIL;
                     } else if(reason.equals("No auth server provisioned")) {
-                        return LOGIN_FAIL_DUPLICATE_USER;
+                        return GlobalValue.LOGIN_FAIL_DUPLICATE_USER;
                     }
-                    return LOGIN_FAIL_UNKNOWN_REASON;
+                    return GlobalValue.LOGIN_FAIL_UNKNOWN_REASON;
                 }
             }
-            return LOGIN_SUCCESS;
+            return GlobalValue.LOGIN_SUCCESS;
         }
 
         /**
@@ -149,55 +149,15 @@ class LoginWifi {
                     .execute();
         }
 
-        /**
-         * Return id of result message
-         *
-         * @param result Login result
-         * @return ID of result message
-         */
-        private int getNotifyText(String result) {
-            switch (result) {
-                case LOGIN_SUCCESS:
-                    return R.string.wifi_login_success;
-                case LOGIN_FAIL_AUTH_FAIL:
-                    return R.string.wifi_login_wrong_pwd;
-                case LOGIN_FAIL_DUPLICATE_USER:
-                    return R.string.wifi_login_duplicate_user;
-                case ALREADY_ONLINE:
-                    return R.string.wifi_login_already_online;
-                case LOGIN_FAIL_UNKNOWN_REASON:
-                default:
-                    return R.string.wifi_login_unknown_reason;
-            }
-        }
-
         @Override
         protected void onPostExecute(String loginResult) {
-            NotificationManager nm = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
-            PendingIntent contentIntent = PendingIntent.getActivity(context, 0, new Intent(), 0);
-            Resources resources = context.getResources();
-            int msgId = getNotifyText(loginResult);
-            long[] vibrate_effect = (loginResult.equals(LOGIN_SUCCESS))? new long[]{1000, 100} : new long[]{1000, 300, 300, 300};
-            Notification n = new Notification
-                    .Builder(context)
-                    .setContentTitle(resources.getString(R.string.app_name))
-                    .setContentText(resources.getString(msgId))
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .setTicker("EFFECT")
-                    .setVibrate(vibrate_effect)
-                    .setLights(Color.GREEN, 1000, 1000)
-                    .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher))
-                    .setContentIntent(contentIntent)
-                    .build();
-            nm.notify("TANet_Roamer_Login", 1, n);
+            try {
+                callback.call(loginResult);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
-
-    public static final String LOGIN_SUCCESS = "Success";
-    public static final String ALREADY_ONLINE = "Online";
-    public static final String LOGIN_FAIL_AUTH_FAIL = "Auth fail";
-    public static final String LOGIN_FAIL_DUPLICATE_USER = "Duplicate user";
-    public static final String LOGIN_FAIL_UNKNOWN_REASON = "Unknown reason";
     private Context context;
     private String username, password;
     private JSONObject apiData;

@@ -62,5 +62,9 @@
         android:defaultValue="true"
         android:title="是否自動登入"
         android:key="is_auto_login" />
+    <SwitchPreference
+        android:defaultValue="true"
+        android:title="當發生錯誤，使用其他種類帳號重試"
+        android:key="retry_with_another_account" />
 
 </PreferenceScreen>
