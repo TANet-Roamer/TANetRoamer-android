@@ -37,6 +37,8 @@
 - 逢甲大學 - vongola12324 (2016/11/15)
 - (其他校園待測試)
 
+特別感謝核心程式碼由 DanSnow 撰寫
+
 ## 開發
 
 ### app/src/main/res/raw/units.json
