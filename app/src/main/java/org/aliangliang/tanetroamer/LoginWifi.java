@@ -161,8 +161,7 @@ class LoginWifi {
         @Override
         protected void onPostExecute(String loginResult) {
             try {
-                if(!loginResult.equals(GlobalValue.LOGIN_SUCCESS))
-//                if(!(loginResult.equals(GlobalValue.LOGIN_SUCCESS) || loginResult.equals(GlobalValue.ALREADY_ONLINE)))
+                if(!(loginResult.equals(GlobalValue.LOGIN_SUCCESS) || loginResult.equals(GlobalValue.ALREADY_ONLINE)))
                     new LoginWifi(context, usernames, passwords, apiData).login(callback);
                 callback.call(loginResult);
             } catch (Exception e) {
@@ -174,7 +173,6 @@ class LoginWifi {
     private String[] usernames, passwords;
     private String username, password;
     private JSONObject apiData;
-    private static final String DEFAULT_API_URL = "http://192.168.0.10:8012/auth/index.html/u";
-//    private static final String DEFAULT_API_URL = "http://securelogin.arubanetworks.com/auth/index.html/u";
+    private static final String DEFAULT_API_URL = "http://securelogin.arubanetworks.com/auth/index.html/u";
     private static JSONObject DEFAULT_DATA = new JSONObject();
 }
