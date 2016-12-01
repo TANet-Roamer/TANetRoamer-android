@@ -9,9 +9,8 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.preference.PreferenceManager;
 import android.util.Log;
-
-import org.json.JSONException;
 
 public class WifiLoginService extends IntentService {
 
@@ -45,48 +44,48 @@ public class WifiLoginService extends IntentService {
     }
 
     protected void onHandleIntent(Intent intent){
-        WifiAccount account = null;
         try {
-            account = new WifiAccount(this);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        if (!account.isLogin()) {
-            Log.i(Debug.TAG, "Service: Not login");
-            return;
-        }
-        LoginWifi login = null;
-        try {
-            login = new LoginWifi(this, account.getUsername(), account.getPassword(), account.getSchoolData());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        Log.i(Debug.TAG, "Service: Start login");
-        Callback callable = new Callback() {
-            public String call(String loginResult) throws Exception {
-                Log.d(Debug.TAG, "Service: Callback!!!!!!!!!!!!!!");
-                NotificationManager nm = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-                PendingIntent contentIntent = PendingIntent.getActivity(context, 0, new Intent(), 0);
-                Resources resources = getResources();
-                int msgId = getNotifyText(loginResult);
-                long[] vibrate_effect = (loginResult.equals(GlobalValue.LOGIN_SUCCESS))? new long[]{1000, 100} : new long[]{1000, 300, 300, 300};
-                int light_color = (loginResult.equals(GlobalValue.LOGIN_SUCCESS))? Color.GREEN : Color.RED;
-                Notification n = new Notification
-                        .Builder(context)
-                        .setContentTitle(resources.getString(R.string.app_name))
-                        .setContentText(resources.getString(msgId))
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setTicker("EFFECT")
-                        .setVibrate(vibrate_effect)
-                        .setLights(light_color, 1000, 1000)
-                        .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher))
-                        .setContentIntent(contentIntent)
-                        .build();
-                nm.notify("TANet_Roamer_Login", 1, n);
-                return null;
+            WifiAccount account = new WifiAccount(this);
+            if (!account.isLogin()) {
+                Log.i(Debug.TAG, "Service: Not login");
+                return;
             }
-        };
-        try {
+
+            final LoginWifi login;
+            if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean("retry_with_another_account", false))
+                login = new LoginWifi(this, account.getUsernames(), account.getPasswords(), account.getSchoolData());
+            else {
+                String[] usernames = {account.getUsername()};
+                String[] passwords = {account.getPassword()};
+                login = new LoginWifi(this, usernames, passwords, account.getSchoolData());
+            }
+            Log.i(Debug.TAG, "Service: Start login");
+
+            final Callback callable = new Callback() {
+                public String call(String loginResult) throws Exception {
+                    Log.d(Debug.TAG, "Service: Callback!!!!!!!!!!!!!!");
+                    NotificationManager nm = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+                    PendingIntent contentIntent = PendingIntent.getActivity(context, 0, new Intent(), 0);
+                    Resources resources = getResources();
+                    Boolean isSuccess = loginResult.equals(GlobalValue.LOGIN_SUCCESS);
+                    int msgId = getNotifyText(loginResult);
+                    long[] vibrate_effect = (isSuccess)? new long[]{1000, 100} : new long[]{1000, 100, 200, 100};
+                    int light_color = (isSuccess)? Color.GREEN : Color.RED;
+                    Notification n = new Notification
+                            .Builder(context)
+                            .setContentTitle(resources.getString(R.string.app_name))
+                            .setContentText(resources.getString(msgId))
+                            .setSmallIcon(R.mipmap.ic_launcher)
+                            .setTicker("EFFECT")
+                            .setVibrate(vibrate_effect)
+                            .setLights(light_color, 1000, 1000)
+                            .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher))
+                            .setContentIntent(contentIntent)
+                            .build();
+                    nm.notify("TANet_Roamer_Login", 1, n);
+                    return null;
+                }
+            };
             login.login(callable);
         } catch (Exception e) {
             e.printStackTrace();

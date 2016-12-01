@@ -12,6 +12,8 @@ import org.jsoup.Jsoup;
 
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -19,13 +21,13 @@ class LoginWifi {
 
     /**
      * @param context The android context
-     * @param username The account for login
-     * @param password The password for login
+     * @param usernames The accounts for login
+     * @param passwords The passwords for login
      */
-    public LoginWifi(Context context, String username, String password, JSONObject apiData) throws JSONException {
+    public LoginWifi(Context context, String[] usernames, String[] passwords, JSONObject apiData) throws JSONException {
         this.context = context;
-        this.username = username;
-        this.password = password;
+        this.usernames = usernames;
+        this.passwords = passwords;
         this.apiData = apiData;
 
         DEFAULT_DATA = new JSONObject("{\n" +
@@ -36,17 +38,24 @@ class LoginWifi {
                "  }");
     }
 
-    /**
-     * @return Successful login or not
-     */
-    public boolean login(Callback callback) throws Exception {
-        if (username == null || password == null) {
-            Log.wtf(Debug.TAG, "Login: Username or password is null?!");
-            return false;
+    private String[] shift(String[] data) {
+        ArrayList<String> list = new ArrayList<String>(Arrays.asList(data));
+        list.remove(0);
+        return list.toArray(new String[0]);
+    }
+
+    public void login(Callback callback) throws Exception {
+        Log.d(Debug.TAG, "LogoWifi: usernames length: " + usernames.length);
+        if (usernames.length == 0 || passwords.length == 0) {
+            Log.i(Debug.TAG, "Login: Username or password is null");
+            return;
         }
+        username = usernames[0];
+        password = passwords[0];
+        usernames = shift(usernames);
+        passwords = shift(passwords);
         Log.i(Debug.TAG, "Login: Start LoginTask");
         new LoginTask(callback).execute(context);
-        return true;
     }
 
     private class LoginTask extends AsyncTask<Context, Void, String> {
@@ -60,15 +69,15 @@ class LoginWifi {
         @Override
         protected String doInBackground(Context... contexts) {
             Log.i(Debug.TAG, "LoginTask: Start");
-            try {
-                Response response = get204Response();
-                if (response.statusCode() == 204) { // Don't need to login
-                    Log.i(Debug.TAG, "LoginTask: Online now");
-                    return GlobalValue.ALREADY_ONLINE;
-                }
-            } catch (IOException e) {
-                Log.w(Debug.TAG, "LoginTask: Can not connect generate204, still login process");
-            }
+//            try {
+//                Response response = get204Response();
+//                if (response.statusCode() == 204) { // Don't need to login
+//                    Log.i(Debug.TAG, "LoginTask: Online now");
+//                    return GlobalValue.ALREADY_ONLINE;
+//                }
+//            } catch (IOException e) {
+//                Log.w(Debug.TAG, "LoginTask: Can not connect generate204, still login process");
+//            }
             Log.i(Debug.TAG, "LoginTask: Need login");
             try {
                 return doLogin();
@@ -152,6 +161,9 @@ class LoginWifi {
         @Override
         protected void onPostExecute(String loginResult) {
             try {
+                if(!loginResult.equals(GlobalValue.LOGIN_SUCCESS))
+//                if(!(loginResult.equals(GlobalValue.LOGIN_SUCCESS) || loginResult.equals(GlobalValue.ALREADY_ONLINE)))
+                    new LoginWifi(context, usernames, passwords, apiData).login(callback);
                 callback.call(loginResult);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -159,8 +171,10 @@ class LoginWifi {
         }
     }
     private Context context;
+    private String[] usernames, passwords;
     private String username, password;
     private JSONObject apiData;
-    private static final String DEFAULT_API_URL = "http://securelogin.arubanetworks.com/auth/index.html/u";
+    private static final String DEFAULT_API_URL = "http://192.168.0.10:8012/auth/index.html/u";
+//    private static final String DEFAULT_API_URL = "http://securelogin.arubanetworks.com/auth/index.html/u";
     private static JSONObject DEFAULT_DATA = new JSONObject();
 }
