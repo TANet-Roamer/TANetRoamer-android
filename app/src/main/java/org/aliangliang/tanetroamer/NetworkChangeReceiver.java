@@ -44,12 +44,12 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
         NetworkInfo.State state = networkInfo.getState();
         Log.i(Debug.TAG, "Receiver: Receive network change event: " + state);
 
-        if(networkInfo != null && networkInfo.isConnected() && networkInfo.getType() != TYPE_WIFI) {
+        if(networkInfo != null && networkInfo.getType() != TYPE_WIFI) {
             Log.i(Debug.TAG, "Receiver: Not connect to wifi");
             return;
         }
 
-        if(state != NetworkInfo.State.CONNECTED) {
+        if(!networkInfo.isConnected()) {
             Log.d(Debug.TAG, "Receiver: Not finish connecting");
             return;
         }
