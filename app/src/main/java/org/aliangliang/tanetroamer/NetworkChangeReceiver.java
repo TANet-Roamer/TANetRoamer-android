@@ -2,9 +2,13 @@ package org.aliangliang.tanetroamer;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import static android.content.Context.CONNECTIVITY_SERVICE;
+import static android.content.Context.WIFI_SERVICE;
 import android.content.Intent;
 import android.net.ConnectivityManager;
+import static android.net.ConnectivityManager.TYPE_WIFI;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
@@ -30,33 +34,40 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
             return;
         }
 
-        if(action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
-            NetworkInfo.State state = getNetworkState(intent);
-            Log.i(Debug.TAG, "Receiver: Receive network change event: " + state);
-            final ConnectivityManager conMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            final NetworkInfo activeNetwork = conMgr.getActiveNetworkInfo();
-            if (activeNetwork != null && activeNetwork.isConnected()) {
-                Log.d(Debug.TAG, "Receiver: State is connect");
-                WifiManager manager = getWifiManager(context);
-                String connectingSSID = getSSID(manager);
-                if (connectingSSID.equals("TANetRoaming")) {
-                    Log.d(Debug.TAG, "Receiver: Match TANetRoming");
-                    Log.i(Debug.TAG, "Receiver: Start login service");
-                    context.startService(new Intent(context, WifiLoginService.class));
-                }
-            } else {
-                Log.d(Debug.TAG, "Receiver: Not connect yet");
-            }
+        ConnectivityManager connectManager = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectManager.getActiveNetworkInfo();
+        if(networkInfo == null) {
+            Log.d(Debug.TAG, "Receiver: No active network");
+            return;
+        }
+
+        NetworkInfo.State state = networkInfo.getState();
+        Log.i(Debug.TAG, "Receiver: Receive network change event: " + state);
+
+        if(networkInfo != null && networkInfo.isConnected() && networkInfo.getType() != TYPE_WIFI) {
+            Log.i(Debug.TAG, "Receiver: Not connect to wifi");
+            return;
+        }
+
+        if(state != NetworkInfo.State.CONNECTED) {
+            Log.d(Debug.TAG, "Receiver: Not finish connecting");
+            return;
+        }
+
+        WifiManager wifiManager = (WifiManager) context.getSystemService(WIFI_SERVICE);
+
+        Log.d(Debug.TAG, "Receiver: State is connect");
+        String connectingSSID = getSSID(wifiManager);
+        Log.d(Debug.TAG, "SSID: " + connectingSSID);
+        if (connectingSSID.equals("TANetRoaming")) {
+            Log.d(Debug.TAG, "Receiver: Match TANetRoming");
+            Log.i(Debug.TAG, "Receiver: Start login service");
+            context.startService(new Intent(context, WifiLoginService.class));
         }
     }
 
     private WifiManager getWifiManager(Context context) {
         return (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
-    }
-
-    private NetworkInfo.State getNetworkState(Intent intent) {
-        NetworkInfo  networkInfo = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
-        return networkInfo.getState();
     }
 
     private String getSSID(WifiManager manager) {

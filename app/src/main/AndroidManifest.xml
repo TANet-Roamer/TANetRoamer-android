@@ -27,10 +27,8 @@
         </activity>
         <receiver android:name="org.aliangliang.tanetroamer.NetworkChangeReceiver">
             <intent-filter>
-                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
                 <action android:name="android.net.wifi.STATE_CHANGE" />
                 <action android:name="android.net.wifi.NETWORK_IDS_CHANGED" />
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
         <service android:name="org.aliangliang.tanetroamer.WifiLoginService" /><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
