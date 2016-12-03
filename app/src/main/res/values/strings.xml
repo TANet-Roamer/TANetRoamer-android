@@ -31,6 +31,7 @@
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="list_preference_entry_default_values">itw</string>
 
+    <string name="wifi_login_SSID">TANetRoaming</string>>
     <string name="wifi_login_success">登入成功</string>>
     <string name="wifi_login_wrong_pwd">登入失敗，帳號密碼錯誤</string>>
     <string name="wifi_login_only_one_user">登入失敗，同一帳號已經使用中，請使用別種帳號。</string>>

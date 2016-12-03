@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -19,6 +20,13 @@ public class WifiLoginService extends IntentService {
     public WifiLoginService() {
         super("WifiLoginService");
         this.context = this;
+    }
+
+    private boolean checkSsid() {
+        WifiManager wifiManager = (WifiManager) context.getSystemService(WIFI_SERVICE);
+        String connectingSSID = wifiManager.getConnectionInfo().getSSID().replace("\"", "");
+        Log.d(Debug.TAG, "SSID: " + connectingSSID);
+        return connectingSSID.equals(context.getResources().getString(R.string.wifi_login_SSID));
     }
 
     /**
@@ -46,6 +54,11 @@ public class WifiLoginService extends IntentService {
     }
 
     protected void onHandleIntent(Intent intent){
+
+        Log.d(Debug.TAG, "Receiver: State is connect");
+        if(!checkSsid()) return;
+        Log.i(Debug.TAG, "Receiver: Start login service");
+
         try {
             WifiAccount account = new WifiAccount(this);
             if (!account.isLogin()) {
@@ -74,16 +87,16 @@ public class WifiLoginService extends IntentService {
                     long[] vibrate_effect = (isSuccess)? new long[]{1000, 100} : new long[]{1000, 100, 200, 100};
                     int light_color = (isSuccess)? Color.GREEN : Color.RED;
                     Notification n = new Notification
-                            .Builder(context)
-                            .setContentTitle(resources.getString(R.string.app_name))
-                            .setContentText(resources.getString(msgId))
-                            .setSmallIcon(R.mipmap.ic_launcher)
-                            .setTicker("EFFECT")
-                            .setVibrate(vibrate_effect)
-                            .setLights(light_color, 1000, 1000)
-                            .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher))
-                            .setContentIntent(contentIntent)
-                            .build();
+                        .Builder(context)
+                        .setContentTitle(resources.getString(R.string.app_name))
+                        .setContentText(resources.getString(msgId))
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setTicker("EFFECT")
+                        .setVibrate(vibrate_effect)
+                        .setLights(light_color, 1000, 1000)
+                        .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
+                        .setContentIntent(contentIntent)
+                        .build();
                     nm.notify("TANet_Roamer_Login", 1, n);
                     return null;
                 }

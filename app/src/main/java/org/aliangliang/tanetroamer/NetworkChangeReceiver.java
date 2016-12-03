@@ -11,7 +11,6 @@ import android.util.Log;
 import org.json.JSONException;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
-import static android.content.Context.WIFI_SERVICE;
 import static android.net.ConnectivityManager.TYPE_WIFI;
 
 public class NetworkChangeReceiver extends BroadcastReceiver {
@@ -45,7 +44,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
         NetworkInfo.State state = networkInfo.getState();
         Log.i(Debug.TAG, "Receiver: Receive network change event: " + state);
 
-        if(networkInfo != null && networkInfo.getType() != TYPE_WIFI) {
+        if(networkInfo.getType() != TYPE_WIFI) {
             Log.i(Debug.TAG, "Receiver: Not connect to wifi");
             return;
         }
@@ -54,17 +53,9 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
             Log.d(Debug.TAG, "Receiver: Not finish connecting");
             return;
         }
+        // Network conntected!!!
 
-        WifiManager wifiManager = (WifiManager) context.getSystemService(WIFI_SERVICE);
-
-        Log.d(Debug.TAG, "Receiver: State is connect");
-        String connectingSSID = getSSID(wifiManager);
-        Log.d(Debug.TAG, "SSID: " + connectingSSID);
-        if (connectingSSID.equals("TANetRoaming")) {
-            Log.d(Debug.TAG, "Receiver: Match TANetRoming");
-            Log.i(Debug.TAG, "Receiver: Start login service");
-            context.startService(new Intent(context, WifiLoginService.class));
-        }
+        context.startService(new Intent(context, WifiLoginService.class));
     }
 
     private WifiManager getWifiManager(Context context) {
