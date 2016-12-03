@@ -2,17 +2,17 @@ package org.aliangliang.tanetroamer;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import static android.content.Context.CONNECTIVITY_SERVICE;
-import static android.content.Context.WIFI_SERVICE;
 import android.content.Intent;
 import android.net.ConnectivityManager;
-import static android.net.ConnectivityManager.TYPE_WIFI;
 import android.net.NetworkInfo;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
 import org.json.JSONException;
+
+import static android.content.Context.CONNECTIVITY_SERVICE;
+import static android.content.Context.WIFI_SERVICE;
+import static android.net.ConnectivityManager.TYPE_WIFI;
 
 public class NetworkChangeReceiver extends BroadcastReceiver {
     @Override
@@ -36,6 +36,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 
         ConnectivityManager connectManager = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectManager.getActiveNetworkInfo();
+
         if(networkInfo == null) {
             Log.d(Debug.TAG, "Receiver: No active network");
             return;

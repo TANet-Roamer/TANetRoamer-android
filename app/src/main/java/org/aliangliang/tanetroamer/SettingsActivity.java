@@ -3,6 +3,7 @@ package org.aliangliang.tanetroamer;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -66,6 +67,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            IntentFilter filter = new IntentFilter();
+            filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+            registerReceiver(new NetworkChangeReceiver(), filter);
+        }
     }
 
     /**
