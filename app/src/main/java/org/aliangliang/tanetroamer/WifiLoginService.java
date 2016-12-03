@@ -33,10 +33,12 @@ public class WifiLoginService extends IntentService {
                 return R.string.wifi_login_success;
             case GlobalValue.LOGIN_FAIL_AUTH_FAIL:
                 return R.string.wifi_login_wrong_pwd;
-            case GlobalValue.LOGIN_FAIL_DUPLICATE_USER:
-                return R.string.wifi_login_duplicate_user;
             case GlobalValue.ALREADY_ONLINE:
                 return R.string.wifi_login_already_online;
+            case GlobalValue.LOGIN_FAIL_ONLY_ONE_USER:
+                return R.string.wifi_login_only_one_user;
+            case GlobalValue.LOGIN_FAIL_NO_INFORMATION:
+                return R.string.wifi_login_empty_user_pwd;
             case GlobalValue.LOGIN_FAIL_UNKNOWN_REASON:
             default:
                 return R.string.wifi_login_unknown_reason;
