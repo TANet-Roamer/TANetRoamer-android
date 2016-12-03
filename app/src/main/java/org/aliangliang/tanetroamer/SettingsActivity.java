@@ -17,6 +17,9 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.preference.SwitchPreference;
+import android.preference.EditTextPreference;
+import android.widget.EditText;
+import static android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
@@ -150,6 +153,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     Context context = preference.getContext();
                     context.startService(new Intent(context, WifiLoginService.class));
                 }
+            } else if (preference instanceof EditTextPreference) {
+                String summary = maskPasswordPreference((EditTextPreference)preference, stringValue);
+                preference.setSummary(summary);
             } else {
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
@@ -158,6 +164,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return true;
         }
     };
+
+    private static String maskPasswordPreference(EditTextPreference preference, String str) {
+        EditText editText = ((EditTextPreference)preference).getEditText();
+        return (editText.getInputType() & TYPE_TEXT_VARIATION_PASSWORD) != 0 ?
+            str.replaceAll(".", "*") :
+            str;
+    }
 
     /**
      * Binds a preference's summary to its value. More specifically, when the
@@ -168,7 +181,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      *
      * @see #sBindPreferenceSummaryToValueListener
      */
-    private static void bindPreferenceSummaryToValue(Preference preference, Boolean useMask) {
+    private static void bindPreferenceSummaryToValue(Preference preference) {
         // Set the listener to watch for value changes.
         preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
 
@@ -177,11 +190,16 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             value = PreferenceManager
                     .getDefaultSharedPreferences(preference.getContext())
                     .getBoolean(preference.getKey(), true);
+        } else if(preference instanceof EditTextPreference) {
+            String str = PreferenceManager
+                    .getDefaultSharedPreferences(preference.getContext())
+                    .getString(preference.getKey(), "");
+            value = maskPasswordPreference((EditTextPreference)preference, str);
         } else {
             String str = PreferenceManager
                     .getDefaultSharedPreferences(preference.getContext())
                     .getString(preference.getKey(), "");
-            value = (useMask) ? str.replaceAll(".", "*") : str;
+            value = str;
         }
 
         sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, value);
@@ -289,15 +307,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             lp.setEntryValues(entryValues.toArray(new CharSequence[entryValues.size()]));
             lp.setDefaultValue("0015");
 
-            bindPreferenceSummaryToValue(findPreference("school_studing"), false);
-            bindPreferenceSummaryToValue(findPreference("id_type"), false);
-            bindPreferenceSummaryToValue(findPreference("wifi_normal_username"), false);
-            bindPreferenceSummaryToValue(findPreference("wifi_normal_password"), true);
-            bindPreferenceSummaryToValue(findPreference("wifi_email_username"), false);
-            bindPreferenceSummaryToValue(findPreference("wifi_email_password"), true);
-            bindPreferenceSummaryToValue(findPreference("wifi_itw_username"), false);
-            bindPreferenceSummaryToValue(findPreference("wifi_itw_password"), true);
-            bindPreferenceSummaryToValue(findPreference("is_auto_login"), false);
+            bindPreferenceSummaryToValue(findPreference("school_studing"));
+            bindPreferenceSummaryToValue(findPreference("id_type"));
+            bindPreferenceSummaryToValue(findPreference("wifi_normal_username"));
+            bindPreferenceSummaryToValue(findPreference("wifi_normal_password"));
+            bindPreferenceSummaryToValue(findPreference("wifi_email_username"));
+            bindPreferenceSummaryToValue(findPreference("wifi_email_password"));
+            bindPreferenceSummaryToValue(findPreference("wifi_itw_username"));
+            bindPreferenceSummaryToValue(findPreference("wifi_itw_password"));
+            bindPreferenceSummaryToValue(findPreference("is_auto_login"));
         }
 
         public boolean onOptionsItemSelected(MenuItem item) {

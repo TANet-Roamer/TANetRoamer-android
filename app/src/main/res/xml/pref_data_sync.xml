@@ -24,6 +24,7 @@
             android:title="密碼"
             android:key="wifi_normal_password"
             android:summary="密碼"
+            android:inputType="textPassword"
             android:singleLine="true" />
     </PreferenceCategory>
     <PreferenceCategory android:title="校園信箱">
@@ -40,6 +41,7 @@
             android:title="密碼"
             android:key="wifi_email_password"
             android:summary="密碼"
+            android:inputType="textPassword"
             android:singleLine="true" />
     </PreferenceCategory>
     <PreferenceCategory android:title="iTaiwan 帳戶">
@@ -56,6 +58,7 @@
             android:title="密碼"
             android:key="wifi_itw_password"
             android:summary="密碼"
+            android:inputType="textPassword"
             android:singleLine="true" />
     </PreferenceCategory>
     <SwitchPreference
