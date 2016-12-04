@@ -76,32 +76,29 @@ public class WifiLoginService extends IntentService {
             }
             Log.i(Debug.TAG, "Service: Start login");
 
-            final Callback callable = new Callback() {
-                public String call(String loginResult) throws Exception {
-                    Log.d(Debug.TAG, "Service: Callback!!!!!!!!!!!!!!");
-                    NotificationManager nm = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-                    PendingIntent contentIntent = PendingIntent.getActivity(context, 0, new Intent(), 0);
-                    Resources resources = getResources();
-                    Boolean isSuccess = loginResult.equals(GlobalValue.LOGIN_SUCCESS);
-                    int msgId = getNotifyText(loginResult);
-                    long[] vibrate_effect = (isSuccess)? new long[]{1000, 100} : new long[]{1000, 100, 200, 100};
-                    int light_color = (isSuccess)? Color.GREEN : Color.RED;
-                    Notification n = new Notification
-                        .Builder(context)
-                        .setContentTitle(resources.getString(R.string.app_name))
-                        .setContentText(resources.getString(msgId))
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setTicker("EFFECT")
-                        .setVibrate(vibrate_effect)
-                        .setLights(light_color, 1000, 1000)
-                        .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
-                        .setContentIntent(contentIntent)
-                        .build();
-                    nm.notify("TANet_Roamer_Login", 1, n);
-                    return null;
-                }
-            };
-            login.login(callable);
+            login.login((loginResult) -> {
+                Log.d(Debug.TAG, "Service: Callback!!!!!!!!!!!!!!");
+                NotificationManager nm = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+                PendingIntent contentIntent = PendingIntent.getActivity(context, 0, new Intent(), 0);
+                Resources resources = getResources();
+                Boolean isSuccess = loginResult.equals(GlobalValue.LOGIN_SUCCESS);
+                int msgId = getNotifyText(loginResult);
+                long[] vibrate_effect = (isSuccess)? new long[]{1000, 100} : new long[]{1000, 100, 200, 100};
+                int light_color = (isSuccess)? Color.GREEN : Color.RED;
+                Notification n = new Notification
+                    .Builder(context)
+                    .setContentTitle(resources.getString(R.string.app_name))
+                    .setContentText(resources.getString(msgId))
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setTicker("EFFECT")
+                    .setVibrate(vibrate_effect)
+                    .setLights(light_color, 1000, 1000)
+                    .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
+                    .setContentIntent(contentIntent)
+                    .build();
+                nm.notify("TANet_Roamer_Login", 1, n);
+                return null;
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
