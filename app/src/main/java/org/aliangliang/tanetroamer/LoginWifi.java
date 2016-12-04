@@ -126,9 +126,9 @@ class LoginWifi {
                     if(reason.equals("Authentication failed")) {
                         return GlobalValue.LOGIN_FAIL_AUTH_FAIL;
                     } else if(reason.equals(GlobalValue.LOGIN_FAIL_ONLY_ONE_USER)) {
-                        return reason;
+                        return GlobalValue.LOGIN_FAIL_ONLY_ONE_USER;
                     } else if(reason.equals(GlobalValue.LOGIN_FAIL_NO_INFORMATION)) {
-                        return reason;
+                        return GlobalValue.LOGIN_FAIL_NO_INFORMATION;
                     }
                     Log.w(Debug.TAG, "LoginTask: Receive an unkown error: " +  reason);
                     return GlobalValue.LOGIN_FAIL_UNKNOWN_REASON;
