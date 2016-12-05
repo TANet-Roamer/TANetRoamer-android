@@ -8,8 +8,6 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
-import org.json.JSONException;
-
 import static android.content.Context.CONNECTIVITY_SERVICE;
 import static android.net.ConnectivityManager.TYPE_WIFI;
 
@@ -19,19 +17,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         Log.d(Debug.TAG, "Receiver: Action:" + action);
 
-        WifiAccount account = null;
-        try {
-            account = new WifiAccount(context);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
         Log.d(Debug.TAG, "Receiver: Receive network event");
-
-        if (!account.isLogin()) {
-            Log.i(Debug.TAG, "Receiver: Not login");
-            return;
-        }
 
         ConnectivityManager connectManager = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectManager.getActiveNetworkInfo();

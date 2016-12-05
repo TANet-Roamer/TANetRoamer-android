@@ -3,7 +3,6 @@ package org.aliangliang.tanetroamer;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,18 +15,13 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.ArrayList;
 
 class WifiAccount {
 
-    public WifiAccount(Context context) throws JSONException {
+    public WifiAccount(Context context, String id_type) throws JSONException {
+        this.id_type = id_type;
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        id_type = preferences.getString(ID_TYPE, null);
         school_studing = preferences.getString(KEY_SCHOOL, null);
-        username = preferences.getString("wifi_" + id_type + "_username", null);
-        password = preferences.getString("wifi_" + id_type + "_password", null);
-        Boolean is_auto_login = preferences.getBoolean(IS_AUTO_LOGIN, true);
-        _isLogin = username != null && password != null && is_auto_login;
 
         InputStream is = context.getResources().openRawResource(R.raw.units);
         Writer writer = new StringWriter();
@@ -63,29 +57,6 @@ class WifiAccount {
                 school_data = current_json;
             }
         }
-
-        id_types = context.getResources().getStringArray(R.array.list_preference_entry_values);
-        for (int i = 0; i < id_types.length; i++) {
-            Log.d(Debug.TAG, "WifiAccount: id_types: " + id_types[i]);
-        }
-    }
-
-    public void setLoginInfo(String username, String password) {
-        SharedPreferences.Editor prefEditor = preferences.edit();
-        _isLogin = true;
-        this.username = username;
-        this.password = password;
-        prefEditor.putString("wifi_" + id_type + "_username", username);
-        prefEditor.putString("wifi_" + id_type + "_password", password);
-        prefEditor.apply();
-    }
-
-    public void clearLogin() {
-        SharedPreferences.Editor prefEditor = preferences.edit();
-        _isLogin = false;
-        prefEditor.putString("wifi_" + id_type + "_username", null);
-        prefEditor.putString("wifi_" + id_type + "_password", null);
-        prefEditor.apply();
     }
 
     public JSONObject getSchoolData() {
@@ -93,57 +64,22 @@ class WifiAccount {
     }
 
     public String getUsername() {
-        return _isLogin ? username : null;
+        return preferences.getString("wifi_" + id_type + "_username", null);
     }
 
     public String getPassword() {
-        return _isLogin ? password : null;
+        return preferences.getString("wifi_" + id_type + "_password", null);
     }
 
-    public String[] getUsernames() {
-        ArrayList<String> username_sequence = new ArrayList<String>();
-        username_sequence.add(preferences.getString("wifi_" + id_type + "_username", null));
-        for (int i = 0; i < id_types.length; i++) {
-            if(!id_types[i].equals(id_type)) {
-                username_sequence.add(preferences.getString("wifi_" + id_types[i] + "_username", null));
-            }
-        }
-        String[] usernames = username_sequence.toArray(new String[0]);
-        for (int i = 0; i < usernames.length; i++) {
-            Log.d(Debug.TAG, "WifiAccount: usernames: " + usernames[i]);
-        }
-        return _isLogin ? usernames : null;
-    }
-
-    public String[] getPasswords() {
-        ArrayList<String> password_sequence = new ArrayList<String>();
-        password_sequence.add(preferences.getString("wifi_" + id_type + "_password", null));
-        for (int i = 0; i < id_types.length; i++) {
-            if(!id_types[i].equals(id_type)) {
-                password_sequence.add(preferences.getString("wifi_" + id_types[i] + "_password", null));
-            }
-        }
-        String[] passwords = password_sequence.toArray(new String[0]);
-        for (int i = 0; i < passwords.length; i++) {
-            Log.d(Debug.TAG, "WifiAccount: passwords: " + passwords[i]);
-        }
-        return _isLogin ? passwords : null;
-    }
-
-    public boolean isLogin() {
-        return _isLogin;
+    public Boolean isEmptyData() {
+        return getUsername() == null || getPassword() == null;
     }
 
     private final static String KEY_SCHOOL = "school_studing";
-    private final static String ID_TYPE = "id_type";
-    private final static String IS_AUTO_LOGIN = "is_auto_login";
 
     private SharedPreferences preferences;
     private String school_studing;
     private JSONObject school_data = new JSONObject();
     private String id_type;
     private String[] id_types;
-    private String username;
-    private String password;
-    private boolean _isLogin;
 }

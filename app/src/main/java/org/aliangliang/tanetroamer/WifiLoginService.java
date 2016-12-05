@@ -6,12 +6,15 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
+import java.util.ArrayList;
 
 public class WifiLoginService extends IntentService {
 
@@ -64,20 +67,27 @@ public class WifiLoginService extends IntentService {
         Log.i(Debug.TAG, "Receiver: Start login service");
 
         try {
-            WifiAccount account = new WifiAccount(this);
-            if (!account.isLogin()) {
-                Log.i(Debug.TAG, "Service: Not login");
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+            Boolean is_auto_login = preferences.getBoolean(IS_AUTO_LOGIN, true);
+            if(!is_auto_login) {
+                Log.i(Debug.TAG, "Service: Coz user inactive auto-login function, stop login process.");
                 return;
             }
-
-            final LoginWifi login;
-            if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean("retry_with_another_account", false))
-                login = new LoginWifi(this, account.getUsernames(), account.getPasswords(), account.getSchoolData());
-            else {
-                String[] usernames = {account.getUsername()};
-                String[] passwords = {account.getPassword()};
-                login = new LoginWifi(this, usernames, passwords, account.getSchoolData());
+            ArrayList<WifiAccount> accounts = new ArrayList<WifiAccount>();
+            if(preferences.getBoolean("retry_with_another_account", false)) {
+                String[] id_types = context.getResources().getStringArray(R.array.list_preference_entry_values);
+                for (String id_type : id_types) {
+                    WifiAccount account = new WifiAccount(this, id_type);
+                    if(!account.isEmptyData())
+                        accounts.add(account);
+                }
+            } else {
+                String id_type = preferences.getString(ID_TYPE, null);
+                WifiAccount account = new WifiAccount(this, id_type);
+                if(!account.isEmptyData())
+                    accounts.add(account);
             }
+            final LoginWifi login = new LoginWifi(this, accounts.toArray(new WifiAccount[0]));
             Log.i(Debug.TAG, "Service: Start login");
 
             final Callback callable = new Callback() {
@@ -114,4 +124,6 @@ public class WifiLoginService extends IntentService {
             e.printStackTrace();
         }
     }
+    private final static String ID_TYPE = "id_type";
+    private final static String IS_AUTO_LOGIN = "is_auto_login";
 }

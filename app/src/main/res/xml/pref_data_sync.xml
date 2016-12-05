@@ -2,7 +2,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <ListPreference
-        android:title="所在學校"
+        android:title="所在學校 / 單位 / 熱點"
         android:key="school_studing"
         android:defaultValue="9999" />
     <ListPreference
@@ -13,14 +13,12 @@
         android:key="id_type" />
     <PreferenceCategory android:title="校園帳戶">
         <EditTextPreference
-            android:defaultValue=""
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:title="帳號"
             android:key="wifi_normal_username"
             android:summary="帳號" />
         <EditTextPreference
-            android:defaultValue=""
             android:selectAllOnFocus="true"
             android:title="密碼"
             android:key="wifi_normal_password"
@@ -30,14 +28,12 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="校園信箱">
         <EditTextPreference
-            android:defaultValue=""
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:title="信箱"
             android:key="wifi_email_username"
             android:summary="信箱" />
         <EditTextPreference
-            android:defaultValue=""
             android:selectAllOnFocus="true"
             android:title="密碼"
             android:key="wifi_email_password"
@@ -47,14 +43,12 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="iTaiwan 帳戶">
         <EditTextPreference
-            android:defaultValue=""
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:title="帳號"
+            android:title="手機號碼"
             android:key="wifi_itw_username"
-            android:summary="帳號" />
+            android:summary="手機號碼" />
         <EditTextPreference
-            android:defaultValue=""
             android:selectAllOnFocus="true"
             android:title="密碼"
             android:key="wifi_itw_password"
@@ -62,13 +56,15 @@
             android:inputType="textPassword"
             android:singleLine="true" />
     </PreferenceCategory>
-    <SwitchPreference
-        android:defaultValue="true"
-        android:title="是否自動登入"
-        android:key="is_auto_login" />
-    <SwitchPreference
-        android:defaultValue="true"
-        android:title="當發生錯誤，使用其他種類帳號重試"
-        android:key="retry_with_another_account" />
+    <PreferenceCategory android:title="進階設定">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:title="是否自動登入"
+            android:key="is_auto_login" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:title="當發生錯誤，使用其他種類帳號重試"
+            android:key="retry_with_another_account" />
+    </PreferenceCategory>
 
 </PreferenceScreen>
