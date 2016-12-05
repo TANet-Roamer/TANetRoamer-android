@@ -88,21 +88,23 @@ public class WifiLoginService extends IntentService {
                     Resources resources = getResources();
                     Boolean isSuccess = loginResult.equals(GlobalValue.LOGIN_SUCCESS);
                     int msgId = getNotifyText(loginResult);
-                    long[] vibrate_effect = (isSuccess)? new long[]{1000, 100} : new long[]{1000, 100, 200, 100};
+                    long[] vibrate_effect = (isSuccess)? new long[]{1000, 100} : new long[]{1000, 300};
                     int light_color = (isSuccess)? Color.GREEN : Color.RED;
                     String msg = resources.getString(msgId);
                     Notification.BigTextStyle style = new Notification.BigTextStyle().bigText(msg);
-                    Notification n = new Notification
+                    Notification.Builder nb = new Notification
                         .Builder(context)
-                        .setContentTitle(resources.getString(R.string.app_name))
                         .setStyle(style)
+                        .setContentTitle(resources.getString(R.string.app_name))
+                        .setContentText(msg)
                         .setSmallIcon(R.mipmap.ic_launcher)
-                        .setTicker("EFFECT")
-                        .setVibrate(vibrate_effect)
-                        .setLights(light_color, 1000, 1000)
                         .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
-                        .setContentIntent(contentIntent)
-                        .build();
+                        .setContentIntent(contentIntent);
+                    if(!loginResult.equals(GlobalValue.ALREADY_ONLINE))
+                        nb.setTicker("EFFECT")
+                            .setVibrate(vibrate_effect)
+                            .setLights(light_color, 1000, 1000);
+                    Notification n = nb.build();
                     nm.notify("TANet_Roamer_Login", 1, n);
                     return null;
                 }

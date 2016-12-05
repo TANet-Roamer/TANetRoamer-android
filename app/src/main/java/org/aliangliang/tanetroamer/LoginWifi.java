@@ -69,6 +69,15 @@ class LoginWifi {
         @Override
         protected String doInBackground(Context... contexts) {
             Log.i(Debug.TAG, "LoginTask: Start");
+            try {
+                Response response = get204Response();
+                if (response.statusCode() == 204) { // Don't need to login
+                    Log.i(Debug.TAG, "LoginTask: Online now");
+                    return GlobalValue.ALREADY_ONLINE;
+                }
+            } catch (IOException e) {
+                Log.w(Debug.TAG, "LoginTask: Can not connect generate204, still login process");
+            }
             Log.i(Debug.TAG, "LoginTask: Need login");
             try {
                 return doLogin();

@@ -33,11 +33,11 @@
 
     <string name="wifi_login_SSID">TANetRoaming</string>>
     <string name="wifi_login_success">登入成功</string>>
-    <string name="wifi_login_wrong_pwd">登入失敗，帳號密碼錯誤</string>>
+    <string name="wifi_login_wrong_pwd">登入失敗，帳號密碼錯誤。</string>>
     <string name="wifi_login_only_one_user">登入失敗，同一帳號已經使用中，請使用別種帳號。</string>>
     <string name="wifi_login_empty_user_pwd">登入失敗，未輸入帳號密碼。</string>>
-    <string name="wifi_login_unknown_reason">登入失敗，未知錯誤</string>>
-    <string name="wifi_login_connect_timeout">登入失敗，連線逾時，可能為密碼錯誤</string>>
-    <string name="wifi_login_host_can_not_found">登入失敗，找不到登入伺服器，可能為所在單位設定錯誤</string>>
-    <string name="wifi_login_already_online">已經連上 TANet Roaming</string>>
+    <string name="wifi_login_unknown_reason">登入失敗，未知錯誤。</string>>
+    <string name="wifi_login_connect_timeout">登入失敗，連線逾時，可能為密碼錯誤。</string>>
+    <string name="wifi_login_host_can_not_found">登入失敗，找不到登入伺服器，可能為所在單位設定錯誤。</string>>
+    <string name="wifi_login_already_online">已經連上 TANet Roaming。</string>>
 </resources>
