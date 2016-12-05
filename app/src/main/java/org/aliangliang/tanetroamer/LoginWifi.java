@@ -69,19 +69,14 @@ class LoginWifi {
         @Override
         protected String doInBackground(Context... contexts) {
             Log.i(Debug.TAG, "LoginTask: Start");
-            try {
-                Response response = get204Response();
-                if (response.statusCode() == 204) { // Don't need to login
-                    Log.i(Debug.TAG, "LoginTask: Online now");
-                    return GlobalValue.ALREADY_ONLINE;
-                }
-            } catch (IOException e) {
-                Log.w(Debug.TAG, "LoginTask: Can not connect generate204, still login process");
-            }
             Log.i(Debug.TAG, "LoginTask: Need login");
             try {
                 return doLogin();
             } catch (IOException e) {
+                if(e.getClass().getName().equals("java.net.SocketTimeoutException"))
+                    return GlobalValue.LOGIN_FAIL_CONNECT_TIMEOUT;
+                else if(e.getClass().getName().equals("java.net.UnknownHostException"))
+                    return GlobalValue.LOGIN_FAIL_UNKOWN_HOST;
                 Log.w(Debug.TAG, "LoginTask: Something bad happened...: " + e);
                 return GlobalValue.LOGIN_FAIL_UNKNOWN_REASON;
             } catch (JSONException e) {
@@ -123,15 +118,15 @@ class LoginWifi {
                 if(url.contains("?errmsg=")) {
                     String reason = URLDecoder.decode(url.replaceFirst(".*?errmsg=", ""), "UTF-8");
                     Log.i(Debug.TAG, "LoginTask: Failed: " +  reason);
-                    if(reason.equals("Authentication failed")) {
-                        return GlobalValue.LOGIN_FAIL_AUTH_FAIL;
-                    } else if(reason.equals(GlobalValue.LOGIN_FAIL_ONLY_ONE_USER)) {
-                        return reason;
-                    } else if(reason.equals(GlobalValue.LOGIN_FAIL_NO_INFORMATION)) {
-                        return reason;
+                    switch (reason) {
+                        case GlobalValue.LOGIN_FAIL_AUTH_FAIL:
+                        case GlobalValue.LOGIN_FAIL_ONLY_ONE_USER:
+                        case GlobalValue.LOGIN_FAIL_NO_INFORMATION:
+                            return reason;
+                        default:
+                            Log.w(Debug.TAG, "LoginTask: Receive an unkown error: " +  reason);
+                            return GlobalValue.LOGIN_FAIL_UNKNOWN_REASON;
                     }
-                    Log.w(Debug.TAG, "LoginTask: Receive an unkown error: " +  reason);
-                    return GlobalValue.LOGIN_FAIL_UNKNOWN_REASON;
                 }
             }
             return GlobalValue.LOGIN_SUCCESS;
@@ -158,13 +153,14 @@ class LoginWifi {
             return connection
                     .method(Connection.Method.POST)
                     .followRedirects(false)
+                    .timeout(10 * 1000)
                     .execute();
         }
 
         @Override
         protected void onPostExecute(String loginResult) {
             try {
-                if(!(loginResult.equals(GlobalValue.LOGIN_SUCCESS) || loginResult.equals(GlobalValue.ALREADY_ONLINE)))
+                if(!(loginResult.equals(GlobalValue.LOGIN_SUCCESS) || loginResult.equals(GlobalValue.ALREADY_ONLINE)) && usernames.length != 0 && passwords.length != 0)
                     new LoginWifi(context, usernames, passwords, apiData).login(callback);
                 callback.call(loginResult);
             } catch (Exception e) {

@@ -2,8 +2,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <ListPreference
-        android:title="所屬學校"
-        android:key="school_studing" />
+        android:title="所在學校"
+        android:key="school_studing"
+        android:defaultValue="9999" />
     <ListPreference
         android:defaultValue="itw"
         android:title="使用帳號類型"

@@ -47,6 +47,10 @@ public class WifiLoginService extends IntentService {
                 return R.string.wifi_login_only_one_user;
             case GlobalValue.LOGIN_FAIL_NO_INFORMATION:
                 return R.string.wifi_login_empty_user_pwd;
+            case GlobalValue.LOGIN_FAIL_CONNECT_TIMEOUT:
+                return R.string.wifi_login_connect_timeout;
+            case GlobalValue.LOGIN_FAIL_UNKOWN_HOST:
+                return R.string.wifi_login_host_can_not_found;
             case GlobalValue.LOGIN_FAIL_UNKNOWN_REASON:
             default:
                 return R.string.wifi_login_unknown_reason;
@@ -86,10 +90,12 @@ public class WifiLoginService extends IntentService {
                     int msgId = getNotifyText(loginResult);
                     long[] vibrate_effect = (isSuccess)? new long[]{1000, 100} : new long[]{1000, 100, 200, 100};
                     int light_color = (isSuccess)? Color.GREEN : Color.RED;
+                    String msg = resources.getString(msgId);
+                    Notification.BigTextStyle style = new Notification.BigTextStyle().bigText(msg);
                     Notification n = new Notification
                         .Builder(context)
                         .setContentTitle(resources.getString(R.string.app_name))
-                        .setContentText(resources.getString(msgId))
+                        .setStyle(style)
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setTicker("EFFECT")
                         .setVibrate(vibrate_effect)
