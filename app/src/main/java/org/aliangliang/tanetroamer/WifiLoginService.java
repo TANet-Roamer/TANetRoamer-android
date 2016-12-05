@@ -74,18 +74,20 @@ public class WifiLoginService extends IntentService {
                 return;
             }
             ArrayList<WifiAccount> accounts = new ArrayList<WifiAccount>();
+            String id_type = preferences.getString(ID_TYPE, null);
+            WifiAccount account = new WifiAccount(this, id_type);
+            if(!account.isEmptyData())
+                accounts.add(account);
             if(preferences.getBoolean("retry_with_another_account", false)) {
                 String[] id_types = context.getResources().getStringArray(R.array.list_preference_entry_values);
-                for (String id_type : id_types) {
-                    WifiAccount account = new WifiAccount(this, id_type);
-                    if(!account.isEmptyData())
-                        accounts.add(account);
+//                String id_type = preferences.getString(ID_TYPE, null);
+                for (String idType : id_types) {
+                    if(!idType.equals(id_type)) {
+                        account = new WifiAccount(this, idType);
+                        if(!account.isEmptyData())
+                            accounts.add(account);
+                    }
                 }
-            } else {
-                String id_type = preferences.getString(ID_TYPE, null);
-                WifiAccount account = new WifiAccount(this, id_type);
-                if(!account.isEmptyData())
-                    accounts.add(account);
             }
             final LoginWifi login = new LoginWifi(this, accounts.toArray(new WifiAccount[0]));
             Log.i(Debug.TAG, "Service: Start login");

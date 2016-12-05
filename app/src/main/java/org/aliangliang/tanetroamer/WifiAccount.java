@@ -22,6 +22,10 @@ class WifiAccount {
         this.id_type = id_type;
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
         school_studing = preferences.getString(KEY_SCHOOL, null);
+        username = preferences.getString("wifi_" + id_type + "_username", null);
+        password = preferences.getString("wifi_" + id_type + "_password", null);
+        if(id_type.equals("itw"))
+            username += "@itw";
 
         InputStream is = context.getResources().openRawResource(R.raw.units);
         Writer writer = new StringWriter();
@@ -64,11 +68,11 @@ class WifiAccount {
     }
 
     public String getUsername() {
-        return preferences.getString("wifi_" + id_type + "_username", null);
+        return username;
     }
 
     public String getPassword() {
-        return preferences.getString("wifi_" + id_type + "_password", null);
+        return password;
     }
 
     public Boolean isEmptyData() {
@@ -78,7 +82,7 @@ class WifiAccount {
     private final static String KEY_SCHOOL = "school_studing";
 
     private SharedPreferences preferences;
-    private String school_studing;
+    private String school_studing, username, password;
     private JSONObject school_data = new JSONObject();
     private String id_type;
     private String[] id_types;

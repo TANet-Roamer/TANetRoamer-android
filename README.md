@@ -1,6 +1,6 @@
 # TANet Roamer 校園網路漫遊器
 
-[![GitHub release](https://img.shields.io/github/release/ALiangLiang/TANetRoamer-android.svg)](https://github.com/ALiangLiang/TANetRoamer-android/releases/latest "最新版本") 
+[![GitHub release](https://img.shields.io/github/release/ALiangLiang/TANetRoamer-android.svg)](https://github.com/ALiangLiang/TANetRoamer-android/releases/latest "最新版本")
 [![license](https://img.shields.io/github/license/ALiangLiang/TANetRoamer-android.svg)](https://github.com/ALiangLiang/TANetRoamer-android/blob/master/LICENSE "MIT開源協議")
 
 <img src="app/src/main/ic_launcher-web.png" alt="logo" width="300"/>
@@ -13,11 +13,15 @@
 
 #### 下載與安裝
 
-開發中，尚未發布。
+目前快速開發中，尚未正式發布，僅於 Alpha 公測，隨時有 crash 的可能性，若遇到 bug，歡迎提報或 PR。
+
+[![下載](google-play-badge.png)](https://play.google.com/store/apps/details?id=org.aliangliang.tanetroamer "前往 Google Play 商店下載")
 
 #### 設定
 
 安裝完後，開啟 APP，選擇所在的校園，並輸入帳號密碼，APP 會自動儲存您的設定與帳密。
+
+可以設定三種帳號，校園帳號、校園信箱與 iTaiwan，iTaiwan 帳號不一定能在每個單位使用，詳細支援請查閱 [TANet 漫遊中心](https://roamingcenter.tanet.edu.tw/?page_id=2033)。
 
 #### 自動登入
 
@@ -42,7 +46,7 @@
 
 ## 開發
 
-### app/src/main/res/raw/units.json
+### [app/src/main/res/raw/units.json](https://github.com/TANet-Roamer/units)
 
 這個檔案是各校的設定檔，id 與 name 都已經準備好，就只差 url 與 data，url 為各校 WIFI 登入的 API 網址，data 則是傳送給 API 的資料，其中值為 %u 與 %p 的皆會被使用者設定的帳號與密碼取代。
 
