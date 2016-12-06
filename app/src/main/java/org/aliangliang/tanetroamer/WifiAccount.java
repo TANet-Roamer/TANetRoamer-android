@@ -3,6 +3,7 @@ package org.aliangliang.tanetroamer;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,12 +38,12 @@ class WifiAccount {
                 writer.write(buffer, 0, n);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(Debug.TAG, "WifiAccount: ", e);
         } finally {
             try {
                 is.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e(Debug.TAG, "WifiAccount: ", e);
             }
         }
 
@@ -51,7 +52,7 @@ class WifiAccount {
         try {
             json = new JSONArray(jsonString);
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(Debug.TAG, "WifiAccount: ", e);
             json = new JSONArray();
         }
 

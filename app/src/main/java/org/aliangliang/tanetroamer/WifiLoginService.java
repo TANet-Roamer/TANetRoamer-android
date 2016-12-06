@@ -80,7 +80,6 @@ public class WifiLoginService extends IntentService {
                 accounts.add(account);
             if(preferences.getBoolean("retry_with_another_account", false)) {
                 String[] id_types = context.getResources().getStringArray(R.array.list_preference_entry_values);
-//                String id_type = preferences.getString(ID_TYPE, null);
                 for (String idType : id_types) {
                     if(!idType.equals(id_type)) {
                         account = new WifiAccount(this, idType);
@@ -123,7 +122,7 @@ public class WifiLoginService extends IntentService {
             };
             login.login(callable);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(Debug.TAG, "WifiLoginService: ", e);
         }
     }
     private final static String ID_TYPE = "id_type";

@@ -269,12 +269,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     writer.write(buffer, 0, n);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e(Debug.TAG, "DataSyncPreferenceFragment: ", e);
             } finally {
                 try {
                     is.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.e(Debug.TAG, "DataSyncPreferenceFragment: ", e);
                 }
             }
 
@@ -283,7 +283,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             try {
                 json = new JSONArray(jsonString);
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e(Debug.TAG, "DataSyncPreferenceFragment: ", e);
                 json = new JSONArray();
             }
 
@@ -301,7 +301,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 entries.add("其他");
                 entryValues.add("9999");
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e(Debug.TAG, "DataSyncPreferenceFragment: ", e);
             }
             ListPreference lp = (ListPreference) findPreference("school_studing");
             lp.setEntries(entries.toArray(new CharSequence[entries.size()]));
