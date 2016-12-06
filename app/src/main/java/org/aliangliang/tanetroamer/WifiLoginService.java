@@ -89,7 +89,7 @@ public class WifiLoginService extends IntentService {
                     }
                 }
             }
-            final LoginWifi login = new LoginWifi(this, accounts.toArray(new WifiAccount[0]));
+            final LoginWifi login = new LoginWifi(this, accounts);
             Log.i(Debug.TAG, "Service: Start login");
 
             final Callback callable = new Callback() {
