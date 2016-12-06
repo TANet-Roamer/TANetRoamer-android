@@ -108,9 +108,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
      */
-    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object value) {
+    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener =
+        (Preference preference, Object value) -> {
             String stringValue = value.toString();
 
             Log.d(Debug.TAG, "SettingActivity: preference changed: " + preference.getKey());
@@ -163,8 +162,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 preference.setSummary(stringValue);
             }
             return true;
-        }
-    };
+        };
 
     private static String maskPasswordPreference(EditTextPreference preference, String str) {
         EditText editText = ((EditTextPreference)preference).getEditText();
