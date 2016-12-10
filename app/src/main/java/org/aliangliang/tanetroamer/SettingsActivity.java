@@ -108,9 +108,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
      */
-    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object value) {
+    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener =
+        (Preference preference, Object value) -> {
             String stringValue = value.toString();
 
             Log.d(Debug.TAG, "SettingActivity: preference changed: " + preference.getKey());
@@ -163,8 +162,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 preference.setSummary(stringValue);
             }
             return true;
-        }
-    };
+        };
 
     private static String maskPasswordPreference(EditTextPreference preference, String str) {
         EditText editText = ((EditTextPreference)preference).getEditText();
@@ -269,12 +267,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     writer.write(buffer, 0, n);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e(Debug.TAG, "DataSyncPreferenceFragment: ", e);
             } finally {
                 try {
                     is.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.e(Debug.TAG, "DataSyncPreferenceFragment: ", e);
                 }
             }
 
@@ -283,7 +281,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             try {
                 json = new JSONArray(jsonString);
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e(Debug.TAG, "DataSyncPreferenceFragment: ", e);
                 json = new JSONArray();
             }
 
@@ -301,7 +299,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 entries.add("其他");
                 entryValues.add("9999");
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e(Debug.TAG, "DataSyncPreferenceFragment: ", e);
             }
             ListPreference lp = (ListPreference) findPreference("school_studing");
             lp.setEntries(entries.toArray(new CharSequence[entries.size()]));

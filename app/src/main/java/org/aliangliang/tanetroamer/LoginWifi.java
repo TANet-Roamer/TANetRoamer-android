@@ -23,7 +23,7 @@ class LoginWifi {
      * @param context The android context
      * @param accounts The account.
      */
-    public LoginWifi(Context context, WifiAccount[] accounts) throws JSONException {
+    public LoginWifi(Context context, ArrayList<WifiAccount> accounts) throws JSONException {
         this.context = context;
         this.accounts = accounts;
 
@@ -35,23 +35,21 @@ class LoginWifi {
                "  }");
     }
 
-    private WifiAccount[] shift(WifiAccount[] data) {
-        ArrayList<WifiAccount> list = new ArrayList<WifiAccount>(Arrays.asList(data));
-        list.remove(0);
-        return list.toArray(new WifiAccount[0]);
+    private void shift() {
+        accounts.remove(0);
     }
 
     public void login(Callback callback) throws Exception {
-        Log.d(Debug.TAG, "LogoWifi: accounts length: " + accounts.length);
-        if (accounts.length == 0) {
+        Log.d(Debug.TAG, "LogoWifi: accounts length: " + accounts.size());
+        if (accounts.size() == 0) {
             Log.i(Debug.TAG, "Login: No account");
             return;
         }
-        WifiAccount account = accounts[0];
+        WifiAccount account = accounts.get(0);
         username = account.getUsername();
         password = account.getPassword();
         apiData = account.getSchoolData();
-        accounts = shift(accounts);
+        shift();
         Log.i(Debug.TAG, "Login: Start LoginTask");
         new LoginTask(callback).execute(context);
     }
@@ -167,16 +165,17 @@ class LoginWifi {
         @Override
         protected void onPostExecute(String loginResult) {
             try {
-                if(!(loginResult.equals(GlobalValue.LOGIN_SUCCESS) || loginResult.equals(GlobalValue.ALREADY_ONLINE)))
+                if(loginResult != GlobalValue.LOGIN_SUCCESS || loginResult != GlobalValue.ALREADY_ONLINE) {
                     new LoginWifi(context, accounts).login(callback);
+                }
                 callback.call(loginResult);
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(Debug.TAG, "LoginWifi:onPostExecute: ", e);
             }
         }
     }
     private Context context;
-    private WifiAccount[] accounts;
+    private ArrayList<WifiAccount> accounts;
     private String username, password;
     private JSONObject apiData;
     private static final String DEFAULT_API_URL = "http://securelogin.arubanetworks.com/auth/index.html/u";

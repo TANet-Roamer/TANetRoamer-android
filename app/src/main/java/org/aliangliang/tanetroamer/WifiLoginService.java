@@ -84,7 +84,6 @@ public class WifiLoginService extends IntentService {
                 accounts.add(account);
             if(preferences.getBoolean("retry_with_another_account", false)) {
                 String[] id_types = context.getResources().getStringArray(R.array.list_preference_entry_values);
-//                String id_type = preferences.getString(ID_TYPE, null);
                 for (String idType : id_types) {
                     if(!idType.equals(id_type)) {
                         account = new WifiAccount(this, idType);
@@ -93,49 +92,48 @@ public class WifiLoginService extends IntentService {
                     }
                 }
             }
-            final LoginWifi login = new LoginWifi(this, accounts.toArray(new WifiAccount[0]));
+            final LoginWifi login = new LoginWifi(this, accounts);
             Log.i(Debug.TAG, "Service: Start login");
 
-            final Callback callable = new Callback() {
-                public String call(String loginResult) throws Exception {
-                    Log.d(Debug.TAG, "Service: Callback!!!!!!!!!!!!!!");
-                    NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                    PendingIntent contentIntent = PendingIntent.getActivity(context, 0, new Intent(), 0);
-                    Resources resources = getResources();
-                    Boolean isSuccess = loginResult.equals(GlobalValue.LOGIN_SUCCESS);
-                    if(loginResult.equals(GlobalValue.ALREADY_ONLINE)) {
-                        if(lastLoginSSID.equals(SSID)) {
-                            Log.i(Debug.TAG, "Service Callback: Aleady login and connect to same wifi.");
-                            return null;
-                        }
-                        lastLoginSSID = SSID;
-                        Log.i(Debug.TAG, "Service Callback: Aleady login but not the same wifi.");
+            login.login((loginResult) -> {
+                Log.d(Debug.TAG, "Service: Callback!!!!!!!!!!!!!!");
+                NotificationManager nm = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+                PendingIntent contentIntent = PendingIntent.getActivity(context, 0, new Intent(), 0);
+                Resources resources = getResources();
+                Boolean isSuccess = loginResult.equals(GlobalValue.LOGIN_SUCCESS);
+                if(loginResult.equals(GlobalValue.ALREADY_ONLINE)) {
+                    if(lastLoginSSID.equals(SSID)) {
+                        Log.i(Debug.TAG, "Service Callback: Aleady login and connect to same wifi.");
+                        return null;
                     }
-                    int msgId = getNotifyText(loginResult);
-                    long[] vibrate_effect = (isSuccess)? new long[]{1000, 100} : new long[]{1000, 300};
-                    int light_color = (isSuccess)? Color.GREEN : Color.RED;
-                    lastLoginSSID = (isSuccess) ? SSID : lastLoginSSID;
-                    String msg = resources.getString(msgId);
-                    Notification.BigTextStyle style = new Notification.BigTextStyle().bigText(msg);
-                    Notification.Builder nb = new Notification.Builder(context)
-                        .setStyle(style)
-                        .setContentTitle(resources.getString(R.string.app_name))
-                        .setContentText(msg)
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
-                        .setContentIntent(contentIntent);
-                    if(!loginResult.equals(GlobalValue.ALREADY_ONLINE))
-                        nb.setTicker("EFFECT")
-                            .setVibrate(vibrate_effect)
-                            .setLights(light_color, 1000, 1000);
-                    Notification n = nb.build();
-                    nm.notify("TANet_Roamer_Login", 1, n);
-                    return null;
+                    lastLoginSSID = SSID;
+                    Log.i(Debug.TAG, "Service Callback: Aleady login but not the same wifi.");
                 }
-            };
-            login.login(callable);
+                int msgId = getNotifyText(loginResult);
+                long[] vibrate_effect = (isSuccess)? new long[]{1000, 100} : new long[]{1000, 300};
+                int light_color = (isSuccess)? Color.GREEN : Color.RED;
+                lastLoginSSID = (isSuccess) ? SSID : lastLoginSSID;
+                String msg = resources.getString(msgId);
+                Notification.BigTextStyle style = new Notification.BigTextStyle().bigText(msg);
+                Notification.Builder nb = new Notification
+                    .Builder(context)
+                    .setStyle(style)
+                    .setContentTitle(resources.getString(R.string.app_name))
+                    .setContentText(msg)
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
+                    .setContentIntent(contentIntent);
+                if(!loginResult.equals(GlobalValue.ALREADY_ONLINE))
+                    nb.setTicker("EFFECT")
+                        .setVibrate(vibrate_effect)
+                        .setLights(light_color, 1000, 1000);
+                Notification n = nb.build();
+                nm.notify("TANet_Roamer_Login", 1, n);
+                return null;
+
+            });
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(Debug.TAG, "WifiLoginService: ", e);
         }
     }
     private static String lastLoginSSID = "";
