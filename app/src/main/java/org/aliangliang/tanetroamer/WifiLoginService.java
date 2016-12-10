@@ -25,11 +25,11 @@ public class WifiLoginService extends IntentService {
         this.context = this;
     }
 
-    private boolean checkSsid() {
+    private String getSsid() {
         WifiManager wifiManager = (WifiManager) context.getSystemService(WIFI_SERVICE);
         String connectingSSID = wifiManager.getConnectionInfo().getSSID().replace("\"", "");
         Log.d(Debug.TAG, "SSID: " + connectingSSID);
-        return connectingSSID.equals(context.getResources().getString(R.string.wifi_login_SSID));
+        return connectingSSID;
     }
 
     /**
@@ -63,7 +63,11 @@ public class WifiLoginService extends IntentService {
     protected void onHandleIntent(Intent intent){
 
         Log.d(Debug.TAG, "Receiver: State is connect");
-        if(!checkSsid()) return;
+        final String SSID = getSsid();
+        if(!SSID.equals(context.getResources().getString(R.string.wifi_login_SSID))) {
+            lastLoginSSID = SSID;
+            return;
+        }
         Log.i(Debug.TAG, "Receiver: Start login service");
 
         try {
@@ -95,17 +99,25 @@ public class WifiLoginService extends IntentService {
             final Callback callable = new Callback() {
                 public String call(String loginResult) throws Exception {
                     Log.d(Debug.TAG, "Service: Callback!!!!!!!!!!!!!!");
-                    NotificationManager nm = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+                    NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                     PendingIntent contentIntent = PendingIntent.getActivity(context, 0, new Intent(), 0);
                     Resources resources = getResources();
                     Boolean isSuccess = loginResult.equals(GlobalValue.LOGIN_SUCCESS);
+                    if(loginResult.equals(GlobalValue.ALREADY_ONLINE)) {
+                        if(lastLoginSSID.equals(SSID)) {
+                            Log.i(Debug.TAG, "Service Callback: Aleady login and connect to same wifi.");
+                            return null;
+                        }
+                        lastLoginSSID = SSID;
+                        Log.i(Debug.TAG, "Service Callback: Aleady login but not the same wifi.");
+                    }
                     int msgId = getNotifyText(loginResult);
                     long[] vibrate_effect = (isSuccess)? new long[]{1000, 100} : new long[]{1000, 300};
                     int light_color = (isSuccess)? Color.GREEN : Color.RED;
+                    lastLoginSSID = (isSuccess) ? SSID : lastLoginSSID;
                     String msg = resources.getString(msgId);
                     Notification.BigTextStyle style = new Notification.BigTextStyle().bigText(msg);
-                    Notification.Builder nb = new Notification
-                        .Builder(context)
+                    Notification.Builder nb = new Notification.Builder(context)
                         .setStyle(style)
                         .setContentTitle(resources.getString(R.string.app_name))
                         .setContentText(msg)
@@ -126,6 +138,7 @@ public class WifiLoginService extends IntentService {
             e.printStackTrace();
         }
     }
+    private static String lastLoginSSID = "";
     private final static String ID_TYPE = "id_type";
     private final static String IS_AUTO_LOGIN = "is_auto_login";
 }
