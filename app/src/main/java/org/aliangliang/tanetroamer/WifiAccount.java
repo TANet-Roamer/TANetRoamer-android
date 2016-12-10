@@ -86,5 +86,4 @@ class WifiAccount {
     private String school_studing, username, password;
     private JSONObject school_data = new JSONObject();
     private String id_type;
-    private String[] id_types;
 }

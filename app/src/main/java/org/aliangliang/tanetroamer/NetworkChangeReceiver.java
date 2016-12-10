@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.wifi.WifiManager;
 import android.util.Log;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
@@ -39,16 +38,8 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
             Log.d(Debug.TAG, "Receiver: Not finish connecting");
             return;
         }
+
         // Network conntected!!!
-
         context.startService(new Intent(context, WifiLoginService.class));
-    }
-
-    private WifiManager getWifiManager(Context context) {
-        return (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
-    }
-
-    private String getSSID(WifiManager manager) {
-        return manager.getConnectionInfo().getSSID().replace("\"", "");
     }
 }
