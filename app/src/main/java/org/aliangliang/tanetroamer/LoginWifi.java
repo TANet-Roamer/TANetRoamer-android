@@ -12,6 +12,8 @@ import org.jsoup.Jsoup;
 
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -89,13 +91,13 @@ class LoginWifi {
             Log.i(Debug.TAG, "LoginTask: 未連上網際網路，需要登入。");
             try {
                 return doLogin();
-            } catch (IOException e) {
+            } catch (SocketTimeoutException e) {
                 // 連線逾時
-                if (e.getClass().getName().equals("java.net.SocketTimeoutException"))
-                    return GlobalValue.LOGIN_FAIL_CONNECT_TIMEOUT;
+                return GlobalValue.LOGIN_FAIL_CONNECT_TIMEOUT;
+            } catch (UnknownHostException e) {
                 // 無法找到 API 主機，有可能是設定檔中的 API 位址設定錯誤。
-                else if (e.getClass().getName().equals("java.net.UnknownHostException"))
-                    return GlobalValue.LOGIN_FAIL_UNKOWN_HOST;
+                return GlobalValue.LOGIN_FAIL_UNKOWN_HOST;
+            } catch (IOException e) {
                 Log.w(Debug.TAG, "LoginTask: 發生一些問題...: " + e);
                 return GlobalValue.LOGIN_FAIL_UNKNOWN_REASON;
             } catch (JSONException e) {
