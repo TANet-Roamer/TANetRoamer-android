@@ -1,5 +1,8 @@
 package org.aliangliang.tanetroamer;
 
+/**
+ * 全域數值。
+ */
 public class GlobalValue {
     public static final String LOGIN_SUCCESS = "Success";
     public static final String ALREADY_ONLINE = "Online";

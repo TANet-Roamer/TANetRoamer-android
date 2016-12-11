@@ -14,32 +14,35 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        Log.d(Debug.TAG, "Receiver: Action:" + action);
+        Log.d(Debug.TAG, "Receiver: 事件:" + action);
 
-        Log.d(Debug.TAG, "Receiver: Receive network event");
+        Log.d(Debug.TAG, "Receiver: 收到 network 事件");
 
         ConnectivityManager connectManager = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectManager.getActiveNetworkInfo();
 
-        if(networkInfo == null) {
-            Log.d(Debug.TAG, "Receiver: No active network");
+        if (networkInfo == null) {
+            Log.d(Debug.TAG, "Receiver: 沒有運作中的網路介面");
             return;
         }
 
         NetworkInfo.State state = networkInfo.getState();
-        Log.i(Debug.TAG, "Receiver: Receive network change event: " + state);
+        Log.i(Debug.TAG, "Receiver: 收到 network 改變的事件: " + state);
 
-        if(networkInfo.getType() != TYPE_WIFI) {
-            Log.i(Debug.TAG, "Receiver: Not connect to wifi");
+        // 檢查連線方式是否為 WIFI
+        if (networkInfo.getType() != TYPE_WIFI) {
+            Log.i(Debug.TAG, "Receiver: 未連上WIFI");
             return;
         }
 
-        if(!networkInfo.isConnected()) {
-            Log.d(Debug.TAG, "Receiver: Not finish connecting");
+        // 檢查是否連網
+        if (!networkInfo.isConnected()) {
+            Log.d(Debug.TAG, "Receiver: 還未連網");
             return;
         }
 
-        // Network conntected!!!
+        // 確定已連上網路
+        // 開始進行事件處理
         context.startService(new Intent(context, WifiLoginService.class));
     }
 }

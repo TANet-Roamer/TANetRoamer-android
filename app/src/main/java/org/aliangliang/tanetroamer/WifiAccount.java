@@ -17,15 +17,22 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 
+/**
+ * TANet Roaming 帳戶物件
+ */
 class WifiAccount {
-
+    /**
+     * @param context
+     * @param id_type 指定此物件的帳號類型
+     * @throws JSONException
+     */
     public WifiAccount(Context context, String id_type) throws JSONException {
         this.id_type = id_type;
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
         school_studing = preferences.getString(KEY_SCHOOL, null);
         username = preferences.getString("wifi_" + id_type + "_username", null);
         password = preferences.getString("wifi_" + id_type + "_password", null);
-        if(id_type.equals("itw"))
+        if (id_type.equals("itw"))
             username += "@itw";
 
         InputStream is = context.getResources().openRawResource(R.raw.units);
@@ -56,9 +63,9 @@ class WifiAccount {
             json = new JSONArray();
         }
 
-        for(int i = 0; i< json.length(); i++) {
+        for (int i = 0; i < json.length(); i++) {
             JSONObject current_json = json.getJSONObject(i);
-            if(current_json.getString("id").equals(school_studing)) {
+            if (current_json.getString("id").equals(school_studing)) {
                 school_data = current_json;
             }
         }
@@ -76,6 +83,11 @@ class WifiAccount {
         return password;
     }
 
+    /**
+     * 使用者是否有設定此類型的帳密
+     *
+     * @return Boolean 是否空資料
+     */
     public Boolean isEmptyData() {
         return getUsername() == null || getPassword() == null;
     }

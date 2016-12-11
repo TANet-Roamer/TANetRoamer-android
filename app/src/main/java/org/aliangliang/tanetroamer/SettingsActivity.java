@@ -92,7 +92,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      */
     private static boolean isXLargeTablet(Context context) {
         return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+            & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
 
     /**
@@ -121,9 +121,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                 // Set the summary to reflect the new value.
                 preference.setSummary(
-                        index >= 0
-                                ? listPreference.getEntries()[index]
-                                : null);
+                    index >= 0
+                        ? listPreference.getEntries()[index]
+                        : null);
 
             } else if (preference instanceof RingtonePreference) {
                 // For ringtone preferences, look up the correct display value
@@ -134,7 +134,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                 } else {
                     Ringtone ringtone = RingtoneManager.getRingtone(
-                            preference.getContext(), Uri.parse(stringValue));
+                        preference.getContext(), Uri.parse(stringValue));
 
                     if (ringtone == null) {
                         // Clear the summary if there was a lookup error.
@@ -148,13 +148,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 }
 
             } else if (preference instanceof SwitchPreference) {
-                if(preference.getKey().equals("is_auto_login") && value.equals(true)) {
+                if (preference.getKey().equals("is_auto_login") && value.equals(true)) {
                     Log.d(Debug.TAG, "SettingActivity: is_auto_login changed ");
                     Context context = preference.getContext();
                     context.startService(new Intent(context, WifiLoginService.class));
                 }
             } else if (preference instanceof EditTextPreference) {
-                String summary = maskPasswordPreference((EditTextPreference)preference, stringValue);
+                String summary = maskPasswordPreference((EditTextPreference) preference, stringValue);
                 preference.setSummary(summary);
             } else {
                 // For all other preferences, set the summary to the value's
@@ -165,7 +165,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         };
 
     private static String maskPasswordPreference(EditTextPreference preference, String str) {
-        EditText editText = ((EditTextPreference)preference).getEditText();
+        EditText editText = ((EditTextPreference) preference).getEditText();
         return (editText.getInputType() & TYPE_TEXT_VARIATION_PASSWORD) != 0 ?
             str.replaceAll(".", "*") :
             str;
@@ -185,19 +185,19 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
 
         Object value;
-        if(preference instanceof SwitchPreference) {
+        if (preference instanceof SwitchPreference) {
             value = PreferenceManager
-                    .getDefaultSharedPreferences(preference.getContext())
-                    .getBoolean(preference.getKey(), true);
-        } else if(preference instanceof EditTextPreference) {
+                .getDefaultSharedPreferences(preference.getContext())
+                .getBoolean(preference.getKey(), true);
+        } else if (preference instanceof EditTextPreference) {
             String str = PreferenceManager
-                    .getDefaultSharedPreferences(preference.getContext())
-                    .getString(preference.getKey(), "");
-            value = maskPasswordPreference((EditTextPreference)preference, str);
+                .getDefaultSharedPreferences(preference.getContext())
+                .getString(preference.getKey(), "");
+            value = maskPasswordPreference((EditTextPreference) preference, str);
         } else {
             String str = PreferenceManager
-                    .getDefaultSharedPreferences(preference.getContext())
-                    .getString(preference.getKey(), "");
+                .getDefaultSharedPreferences(preference.getContext())
+                .getString(preference.getKey(), "");
             value = str;
         }
 
@@ -210,7 +210,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      */
     protected boolean isValidFragment(String fragmentName) {
         return PreferenceFragment.class.getName().equals(fragmentName)
-                || DataSyncPreferenceFragment.class.getName().equals(fragmentName);
+            || DataSyncPreferenceFragment.class.getName().equals(fragmentName);
     }
 
     /**
@@ -219,14 +219,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      */
     public Action getIndexApiAction() {
         Thing object = new Thing.Builder()
-                .setName("Settings Page") // TODO: Define a title for the content shown.
-                // TODO: Make sure this auto-generated URL is correct.
-                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
-                .build();
+            .setName("Settings Page") // TODO: Define a title for the content shown.
+            // TODO: Make sure this auto-generated URL is correct.
+            .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+            .build();
         return new Action.Builder(Action.TYPE_VIEW)
-                .setObject(object)
-                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
-                .build();
+            .setObject(object)
+            .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+            .build();
     }
 
     @Override
@@ -257,6 +257,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             addPreferencesFromResource(R.xml.pref_data_sync);
             setHasOptionsMenu(true);
 
+            // 建立單位清單的輸入流
             InputStream is = findPreference("school_studing").getContext().getResources().openRawResource(R.raw.units);
             Writer writer = new StringWriter();
             char[] buffer = new char[1024];
@@ -275,8 +276,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     Log.e(Debug.TAG, "DataSyncPreferenceFragment: ", e);
                 }
             }
-
+            // 將單位清單輸入流，轉為文字
             String jsonString = writer.toString();
+            // 轉成 JSONArray 物件
             JSONArray json;
             try {
                 json = new JSONArray(jsonString);
@@ -284,28 +286,33 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 Log.e(Debug.TAG, "DataSyncPreferenceFragment: ", e);
                 json = new JSONArray();
             }
-
+            // 格式化單位清單
             ArrayList<CharSequence> entries = new ArrayList<CharSequence>();
             ArrayList<CharSequence> entryValues = new ArrayList<CharSequence>();
-
             try {
-                for(int i = 0; i < json.length(); i++) {
+                for (int i = 0; i < json.length(); i++) {
                     JSONObject obj = json.getJSONObject(i);
-                    if(obj.has("data")) {
+                    if (obj.has("data")) {
                         entries.add((CharSequence) obj.getString("name"));
                         entryValues.add((CharSequence) obj.getString("id"));
                     }
                 }
+                // 在清單尾端新增「其他」單位，讓使用者使用預設設定
                 entries.add("其他");
                 entryValues.add("9999");
             } catch (JSONException e) {
                 Log.e(Debug.TAG, "DataSyncPreferenceFragment: ", e);
             }
+            // 在介面元件「所在單位」清單，動態新增單位資訊
             ListPreference lp = (ListPreference) findPreference("school_studing");
+            // 動態新增「單位名稱」
             lp.setEntries(entries.toArray(new CharSequence[entries.size()]));
+            // 動態新增「單位 ID」
             lp.setEntryValues(entryValues.toArray(new CharSequence[entryValues.size()]));
+            // 設定預設單位為彰師大 :P
             lp.setDefaultValue("0015");
 
+            // 綁定介面元件的 Summary 與 Value
             bindPreferenceSummaryToValue(findPreference("school_studing"));
             bindPreferenceSummaryToValue(findPreference("id_type"));
             bindPreferenceSummaryToValue(findPreference("wifi_normal_username"));
